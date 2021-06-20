@@ -4,7 +4,8 @@ import { formatDate } from '../../../utils/formatDates'
 import { useRouter } from 'next/router'
 import Nav from "../../../components/Nav"
 import { withAuthUser } from 'next-firebase-auth'
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline"
+import { PencilAltIcon, TrashIcon, HeartIcon } from "@heroicons/react/outline"
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid"
 import { useAuthUser } from 'next-firebase-auth'
 import getAbsoluteURL from "../../../utils/getAbsoluteURL"
 import { useEffect, useState } from "react"
@@ -70,9 +71,23 @@ const index = ({ data, error, uuid }) => {
 
     const [trashHover, setTrashHover] = useState(false)
     const [editHover, setEditHover] = useState(false)
-    const [actionLoading, setActionLoading] = useState(false)
+    const [likeHover, setLikeHover] = useState(false)
+
+    const [likesCount, setLikesCount] = useState(data.likes.length) /* change for actual likes count from db */
 
     const AuthUser = useAuthUser()
+    
+    const [isLikedByUser, setLikedByUser] = useState(false) /* change for actual isLikedByUser info from db */
+
+    useEffect(async () => {
+
+        if (AuthUser.email) {
+            setLikedByUser(data.likes.includes(AuthUser.email))
+        }
+        
+    }, [AuthUser.email])
+
+    const [actionLoading, setActionLoading] = useState(false)
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -93,6 +108,10 @@ const index = ({ data, error, uuid }) => {
     useEffect(() => {
         setEditHover(false)
     }, [thisBlog])
+    
+    useEffect(() => {
+        setLikeHover(false)
+    }, [isLikedByUser])
 
     async function deletePost() {
 
@@ -246,13 +265,32 @@ const index = ({ data, error, uuid }) => {
         setActionLoading(false)
     }
 
+    async function likePost() {
+
+        setActionLoading(true)
+
+        const token = await AuthUser.getIdToken()
+        const { data } = await axios.post(getAbsoluteURL('/api/setlikestateblog'), { uuid }, { headers : { Authorization: `Bearer ${token}` } })
+
+        if (data.error) {
+            Swal.fire("Error", data.error, "error")
+        } else {
+            //returns data.nowLiked
+            setLikesCount(likesCount + (isLikedByUser ? -1 : 1))
+            setLikedByUser(!isLikedByUser)
+        }
+
+        setActionLoading(false)
+
+    }
+
 
     return (
         <>
             <Nav uuid={uuid} />
             <div className="text-center p-10">
                 <p className="textPink font-semibold uppercase pb-4 md:pb-0">{formatDate(thisBlog._date)}</p>
-                <h1 className="textYellow text-4xl font-bold pb-4">{thisBlog.blog.title}</h1>
+                <h1 className={`textYellow text-4xl font-bold ${!AuthUser.claims.admin || !AuthUser.email ? 'pb-0' : 'pb-4'}`}>{thisBlog.blog.title}</h1>
                 {AuthUser.claims.admin && <div className="mb-4">
                     <button className={`mx-3 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none ${actionLoading && 'animate-pulse'}`} onClick={() => editPost()}
                     onMouseOver={() => setEditHover(true)} onMouseLeave={() => setEditHover(false)} disabled={actionLoading}>
@@ -264,6 +302,21 @@ const index = ({ data, error, uuid }) => {
                         <span className="sr-only">Delete blog</span>
                         <TrashIcon className={`h-6 w-6 ${trashHover && !actionLoading && 'animate-bounce'}`} aria-hidden="true" />
                     </button>
+                </div>}
+                {!AuthUser.claims.admin && AuthUser.email ? 
+                <div className="mb-4">
+                    <button className={`mx-3 p-1 rounded-full ${isLikedByUser ? 'text-white hover:text-gray-400' : 'text-gray-400 hover:text-white'} focus:outline-none`}
+                    onClick={() => likePost()} onMouseOver={() => setLikeHover(true)} onMouseLeave={() => setLikeHover(false)} disabled={actionLoading}>
+                        <span className="sr-only">Like blog</span>
+                        <div className="flex justify-center">{likesCount} {isLikedByUser ? <HeartIconSolid className={`ml-2 h-6 w-6 fill-current ${actionLoading && 'animate-pulse'}`} aria-hidden="true" /> :
+                        <HeartIcon className={`ml-2 h-6 w-6 ${actionLoading && 'animate-pulse'}`} aria-hidden="true" />}</div>
+                    </button>
+                </div> : 
+                <div className="mb-4">
+                    <div className="text-gray-400">
+                        <span className="sr-only">Likes blog</span>
+                        <div className="flex justify-center">{likesCount}<HeartIconSolid className={`ml-2 h-6 w-6 fill-current`} aria-hidden="true" /></div>
+                    </div>
                 </div>}
                 
                 <div id="resetFont" className="text-justify textWhite font-medium md:px-44" dangerouslySetInnerHTML={createBlogBody(thisBlog.blog.body)}></div>
@@ -279,7 +332,7 @@ export const getStaticProps = async (context) => {
 
     try {
 
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/getblog?uuid=${uuid}`)
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/getblog?uuid=${uuid}`, { params : { getlikes : true } })
 
         return {
             props: {

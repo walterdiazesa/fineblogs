@@ -81,7 +81,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
           validationOrError = true
 
           const token = await AuthUser.getIdToken()
-          const { data, error } = await axios.post(getAbsoluteURL('/api/blog'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
+          const { data } = await axios.post(getAbsoluteURL('/api/blog'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
 
           if (data.error) {
             addPostModalTitle = 'Failed adding blog'
