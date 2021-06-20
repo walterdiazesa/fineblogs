@@ -20,6 +20,11 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
 
   const AuthUser = useAuthUser()
 
+  /*if (AuthUser.claims.admin) {
+    console.log("Nav (AuthUser.claims.admin): ")
+    console.log(AuthUser.claims.admin)
+  }*/
+
   /*const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -57,6 +62,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
         let addPostModalBody = ""
         let addPostModalIcon = "info"
         let validationOrError = false
+        let addPostFailed = false
 
         if (formValues.length !== 2) {
 
@@ -77,10 +83,11 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
           const token = await AuthUser.getIdToken()
           const { data, error } = await axios.post(getAbsoluteURL('/api/blog'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
 
-          if (error) {
+          if (data.error) {
             addPostModalTitle = 'Failed adding blog'
-            addPostModalBody = error.message
+            addPostModalBody = data.error
             addPostModalIcon = 'error'
+            addPostFailed = true
           } else {
             addPostModalTitle = 'Success'
             addPostModalBody = `Post "${data.blog.title}" created successfully`
@@ -100,8 +107,9 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
           title: validationOrError ? addPostModalTitle : undefined,
           text: addPostModalBody,
           icon: addPostModalIcon,
-          showConfirmButton: false,
-          timer: validationOrError ? 1750 : 1000
+          showConfirmButton: addPostFailed,
+          confirmButtonText: "Understand",
+          timer: addPostFailed ? undefined : validationOrError ? 1750 : 1250
         })
       }
 
@@ -145,7 +153,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
                 <div className="hidden sm:block sm:ml-6">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
-                      !AuthUser.email && item.name === "Create Blog" ? null :
+                      !AuthUser.claims.admin && item.name === "Create Blog" ? null :
                       <Link href={item.name === "Create Blog" ? (uuid ? `/blog/[uuid]` : item.href) : item.href} as={item.name === "Create Blog" ? (uuid ? `/blog/${uuid}` : item.href) : undefined} key={item.name}><a
                         onClick={() => { createBlog(item.name) }}
                         className={classNames(
@@ -259,7 +267,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* <Link href={item.name === "Create Blog" ? (uuid ? `/blog/[uuid]` : item.href) : item.href} as={item.name === "Create Blog" ? (uuid ? `/blog/${uuid}` : item.href) : undefined} key={item.name}> */}
               {navigation.map((item) => (
-                !AuthUser.email && item.name === "Create Blog" ? null :
+                !AuthUser.claims.admin && item.name === "Create Blog" ? null :
                 <Link key={item.name} href={item.name === "Create Blog" ? (uuid ? `/blog/[uuid]` : item.href) : item.href} as={item.name === "Create Blog" ? (uuid ? `/blog/${uuid}` : item.href) : undefined}><a onClick={() => { createBlog(item.name) }} className={classNames(
                     item.current
                       ? "bgNavItem text-white"

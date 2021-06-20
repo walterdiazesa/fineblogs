@@ -80,6 +80,16 @@ const index = ({ data, error, uuid }) => {
 
     const [thisBlog, setThisBlog] = useState(data)
 
+    /* if (AuthUser.firebaseUser) {
+        console.log(AuthUser.firebaseUser)
+
+        try {
+            AuthUser.firebaseUser.getIdTokenResult(false).then(token => console.log(token.claims))
+        } catch (error) {
+            console.error(error)
+        }
+    } */
+
     useEffect(() => {
         setEditHover(false)
     }, [thisBlog])
@@ -243,7 +253,7 @@ const index = ({ data, error, uuid }) => {
             <div className="text-center p-10">
                 <p className="textPink font-semibold uppercase pb-4 md:pb-0">{formatDate(thisBlog._date)}</p>
                 <h1 className="textYellow text-4xl font-bold pb-4">{thisBlog.blog.title}</h1>
-                {AuthUser.email && <div className="mb-4">
+                {AuthUser.claims.admin && <div className="mb-4">
                     <button className={`mx-3 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none ${actionLoading && 'animate-pulse'}`} onClick={() => editPost()}
                     onMouseOver={() => setEditHover(true)} onMouseLeave={() => setEditHover(false)} disabled={actionLoading}>
                         <span className="sr-only">Edit blog</span>

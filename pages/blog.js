@@ -30,7 +30,7 @@ const Demo = () => {
   return (
     <>
         <Nav blogHookGet={blogs} blogHookSet={setBlogs} />
-        <div className="grid grid-cols-1 2xl:grid-cols-3 2xl:px-80 mt-3 2xl:mt-5">
+        <div className="grid grid-cols-1 2xl:grid-cols-3 2xl:px-80 my-3 2xl:my-5">
           {blogs && blogs.map(blog => {
             return <BlogGrid key={blog._id} uuid={blog._id} date={blog._date} title={blog.blog.title} body={blog.blog.body} />
           })}

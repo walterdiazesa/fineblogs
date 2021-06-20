@@ -21,7 +21,15 @@ const handler = async (req, res) => {
     }
 
     try {
-        await verifyIdToken(token.replace("Bearer ", ""))
+        const isAdmin = await verifyIdToken(token.replace("Bearer ", ""))
+
+        // If get here, the user is an valid user, but not necessary an admin user... yet
+
+        if (!isAdmin.claims.admin) {
+            return res.status(200).json({ error: "You're not an admin, you have no permissions to do this action" })
+        }
+
+        // If get here, the user is an admin type user, congratulations!
 
         const uuid = uuidv4()
         let createTime = Date.now()
@@ -39,7 +47,7 @@ const handler = async (req, res) => {
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e)
-        return res.status(403).json({ error: 'Not authorized' })
+        return res.status(200).json({ error: 'Not authorized' })
     }
 
 }
