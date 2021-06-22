@@ -9,6 +9,7 @@ import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid"
 import { useAuthUser } from 'next-firebase-auth'
 import getAbsoluteURL from "../../../utils/getAbsoluteURL"
 import { useEffect, useState } from "react"
+import CommentGrid from "../../../components/CommentGrid"
 
 const index = ({ data, error, uuid }) => {
 
@@ -270,7 +271,7 @@ const index = ({ data, error, uuid }) => {
         setActionLoading(true)
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.post(getAbsoluteURL('/api/setlikestateblog'), { uuid }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.post(getAbsoluteURL('/api/setlikestateblog'), { uuid, isLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire("Error", data.error, "error")
@@ -284,11 +285,46 @@ const index = ({ data, error, uuid }) => {
 
     }
 
+    const [commentHookGet, commentHookSet] = useState(data.comments)
+
+    async function createComment() {
+
+        if (document.getElementById("inputCommentBody").value.trim().length === 0) {
+            Swal.fire({
+                title: 'Failed adding comment',
+                text: 'The body for the comment have to be something',
+                icon: 'error',
+                confirmButtonText: 'Understand'
+            })
+            return
+        }
+
+        const token = await AuthUser.getIdToken()
+        const { data } = await axios.post(getAbsoluteURL('/api/comment'), { body: document.getElementById("inputCommentBody").value, uuid: uuid }, { headers : { Authorization: `Bearer ${token}` } })
+
+        if (data.error) {
+            Swal.fire({
+                title: 'Failed adding comment',
+                text: data.error,
+                icon: 'error',
+                confirmButtonText: 'Understand'
+            })
+        } else {
+            commentHookSet([{ _id: data._id, comment: { created_by: data.comment.created_by, body: data.comment.body }, _date: data._date }, ...commentHookGet])
+            //console.log(data)
+            //console.log(commentHookGet)
+            document.getElementById("inputCommentBody").value = ""
+        }
+    }
+
+    function deleteComment(id) {
+        commentHookSet(commentHookGet.filter(comment => comment._id !== id))
+    }
 
     return (
         <>
             <Nav uuid={uuid} />
-            <div className="text-center p-10">
+            <div className={`text-center ${AuthUser.email ? '' : 'pb-0'} p-10`}>
                 <p className="textPink font-semibold uppercase pb-4 md:pb-0">{formatDate(thisBlog._date)}</p>
                 <h1 className={`textYellow text-4xl font-bold ${!AuthUser.claims.admin || !AuthUser.email ? 'pb-0' : 'pb-4'}`}>{thisBlog.blog.title}</h1>
                 {AuthUser.claims.admin && <div className="mb-4">
@@ -321,6 +357,20 @@ const index = ({ data, error, uuid }) => {
                 
                 <div id="resetFont" className="text-justify textWhite font-medium md:px-44" dangerouslySetInnerHTML={createBlogBody(thisBlog.blog.body)}></div>
             </div>
+
+            <div className="px-10">
+                <div className={`text-center md:px-44 pb-3`}>
+                    {AuthUser.email && <><textarea id="inputCommentBody" className="w-full px-3 py-2 rounded-lg focus:outline-none border-slatebluenav focus:border-white resize-none border-2 bg-slateblueinput textWhite" rows="4" placeholder="Write your comment..."></textarea>
+                    <div className="text-right">
+                        <button className="text-gray-300 bgNavItemHover hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => createComment()}>Submit Comment</button>
+                    </div></>}
+                    <div className={`${AuthUser.email ? 'py-4' : ''}`}>
+                        {commentHookGet.map((comment) => {
+                            return <CommentGrid key={comment._id} updateComments={deleteComment} uuid={uuid} id={comment._id} userEmail={comment.comment.created_by} userComment="walterwalon" date={comment._date} body={comment.comment.body} />
+                        })}
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
@@ -332,7 +382,7 @@ export const getStaticProps = async (context) => {
 
     try {
 
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/getblog?uuid=${uuid}`, { params : { getlikes : true } })
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/getblog?uuid=${uuid}`, { params : { getlikes : true, getcomments: true } })
 
         return {
             props: {

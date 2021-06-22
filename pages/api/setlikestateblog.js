@@ -22,13 +22,27 @@ const handler = async (req, res) => {
 
         let nowLiked
 
-        if ((await docRef.get()).exists) {
+        // Set like with known of if it already liked by the user
+        if (req.body.isLikedByUser === undefined) {
+            return res.status(200).json({ error: 'Missed (Liked By User) info' })
+        } else {
+            nowLiked = !req.body.isLikedByUser
+
+            if (req.body.isLikedByUser) {
+                await docRef.delete()
+            } else {
+                await docRef.set({})
+            }
+        }
+        
+        // Set like without known of if it already liked by the user (double query to Firestore)
+        /*if ((await docRef.get()).exists) {
             await docRef.delete()
             nowLiked = false
         } else {
             await docRef.set({})
             nowLiked = true
-        }
+        }*/
     
         return res.status(200).json({ nowLiked })
 
