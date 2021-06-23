@@ -7,11 +7,11 @@ const handler = async (req, res) => {
     }
 
     if (!req.body.body) {
-        return res.status(200).json({ error: 'Missed comment body' }) //400
+        return res.status(200).json({ error: 'Missed reply body' }) //400
     }
 
     if (req.body.body.trim().length === 0) {
-        return res.status(200).json({ error: 'Comment body have to be something' }) //400
+        return res.status(200).json({ error: 'Reply body have to be something' }) //400
     }
 
     const token = req.headers.authorization
@@ -20,12 +20,12 @@ const handler = async (req, res) => {
         return res.status(200).json({ error: 'unauthenticated' }) //401
     }
 
-    if (!req.body.uuid) {
-        return res.status(200).json({ error: 'Missed identifier parameter' })
+    if (!req.body.postuuid || !req.body.postuuid) {
+        return res.status(200).json({ error: 'Missed at least one identifier parameter' })
     }
 
     try {
-        const commentOwner = await verifyIdToken(token.replace("Bearer ", ""))
+        const replyOwner = await verifyIdToken(token.replace("Bearer ", ""))
 
         // If get here, the user is an valid user, but not necessary an admin user... yet
         // If get here, the user is an admin type user, congratulations!
@@ -33,15 +33,15 @@ const handler = async (req, res) => {
         const uuid = uuidv4()
         let createTime = Date.now()
 
-        await getFirebaseAdmin().firestore().collection("blogs").doc(req.body.uuid).collection('comments').doc(uuid).set({
-            created_by: commentOwner.email,
+        await getFirebaseAdmin().firestore().collection("blogs").doc(req.body.postuuid).collection('comments').doc(req.body.commentid).collection('replies').doc(uuid).set({
+            created_by: replyOwner.email,
             body: req.body.body,
             created_at: Date.now()
         }).then(({writeTime}) => createTime = writeTime)
 
-        const newComment = { _id: uuid, comment: { body: req.body.body, created_by: commentOwner.email }, _date: createTime }
+        const newReply = { _id: uuid, reply: { body: req.body.body, created_by: replyOwner.email }, _date: createTime }
 
-        return res.status(200).json(newComment)
+        return res.status(200).json(newReply)
         
     } catch (e) {
         // eslint-disable-next-line no-console

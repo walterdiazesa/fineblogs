@@ -366,7 +366,7 @@ const index = ({ data, error, uuid }) => {
                     </div></>}
                     <div className={`${AuthUser.email ? 'py-4' : ''}`}>
                         {commentHookGet.map((comment) => {
-                            return <CommentGrid key={comment._id} updateComments={deleteComment} uuid={uuid} id={comment._id} userEmail={comment.comment.created_by} userComment="walterwalon" date={comment._date} body={comment.comment.body} />
+                            return <CommentGrid key={comment._id} updateComments={deleteComment} uuid={uuid} id={comment._id} userEmail={comment.comment.created_by} date={comment._date} body={comment.comment.body} />
                         })}
                     </div>
                 </div>
