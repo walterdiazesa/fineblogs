@@ -1,11 +1,11 @@
-import { setAuthCookies } from 'next-firebase-auth'
-import initAuth from '../../utils/initAuth'
+import { unsetAuthCookies } from 'next-firebase-auth'
+import initAuth from '../../../utils/initAuth'
 
 initAuth()
 
 const handler = async (req, res) => {
   try {
-    await setAuthCookies(req, res)
+    await unsetAuthCookies(req, res)
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e)

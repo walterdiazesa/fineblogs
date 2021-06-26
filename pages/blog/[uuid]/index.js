@@ -134,10 +134,13 @@ const index = ({ data, error, uuid }) => {
             try {
 
                 const token = await AuthUser.getIdToken()
-                const { data } = await axios.delete(getAbsoluteURL(`/api/deleteblog/?uuid=${uuid}`), {
+                const { data } = await axios.delete(getAbsoluteURL(`/api/blogs/${uuid}`), {
                     headers : {
                         Authorization: `Bearer ${token}`
-                    }
+                    },
+                    /* params : {
+                        blogid: uuid
+                    } */
                 })
                 
                 //await sleep(2000)
@@ -185,12 +188,23 @@ const index = ({ data, error, uuid }) => {
 
         const {value: formValues} = await Swal.fire({
             title: 'Update Blog',
+            //width: 1200,
+            /*imageUrl: '/imgs/dummyimg.png',
+            imageWidth: '90%',
+            imageHeight: 'auto',
+            imageAlt: 'dummyimg',*/
             html:
-              `<input id="swal-input1" class="swal2-input" placeholder="Leave blank for no changes">` + /*value='${thisBlog.blog.title}'*/
-              `<input id="swal-input2" class="swal2-textarea" placeholder="Leave blank for no changes">`/*value='${thisBlog.blog.body}'*/,
+                `<img class="h-48 w-full object-cover rounded-md mb-5" src="/imgs/dummyimg.png" alt="dummyimg">` +
+                `<input id="swal-input1" class="swal2-input" style="margin: 0; width: 100%;" placeholder="Leave blank for no changes">` + /*value='${thisBlog.blog.title}'*/
+                `<textarea id="swal-input2" class="overflow-y-hidden swal2-textarea" style="padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; width: 100%;" placeholder="Leave blank for no changes">`, /*value='${thisBlog.blog.body}'*/
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Update Blog',
+            didOpen: () => {
+                const content = Swal.getHtmlContainer()
+                content.querySelector("#swal-input1").value = thisBlog.blog.title
+                content.querySelector("#swal-input2").value = thisBlog.blog.body
+            },
             preConfirm: () => {
               return [
                 document.getElementById('swal-input1').value,
@@ -223,7 +237,7 @@ const index = ({ data, error, uuid }) => {
 
                 if (addPostModalBody === "Changes successfully applied") {
                     const token = await AuthUser.getIdToken()
-                    const { data } = await axios.put(getAbsoluteURL('/api/editblog'), { formValues, uuid, fieldUpdated }, { headers : { Authorization: `Bearer ${token}` } })
+                    const { data } = await axios.put(getAbsoluteURL(`/api/blogs/${uuid}`), { formValues, fieldUpdated }, { headers : { Authorization: `Bearer ${token}` }/*, params : { blogid : uuid } */})
                     errorCallback = data.error
 
                     if (!data.error) {
@@ -271,7 +285,7 @@ const index = ({ data, error, uuid }) => {
         setActionLoading(true)
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.post(getAbsoluteURL('/api/setlikestateblog'), { uuid, isLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.put(getAbsoluteURL('/api/blogs/likes'), { uuid, isLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire("Error", data.error, "error")
@@ -300,7 +314,7 @@ const index = ({ data, error, uuid }) => {
         }
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.post(getAbsoluteURL('/api/comment'), { body: document.getElementById("inputCommentBody").value, uuid: uuid }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.post(getAbsoluteURL('/api/blogs/comments'), { body: document.getElementById("inputCommentBody").value, uuid: uuid }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire({
@@ -382,8 +396,8 @@ export const getStaticProps = async (context) => {
 
     try {
 
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/getblog?uuid=${uuid}`, { params : { getlikes : true, getcomments: true } })
-
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs/${uuid}`, { params : { getlikes : true, getcomments: true } })
+        
         return {
             props: {
                 data,
@@ -393,7 +407,7 @@ export const getStaticProps = async (context) => {
         }
         
     } catch (error) {
-
+        
         return {
             props: {
                 error: { name: error.name, message: error.message },
@@ -412,7 +426,7 @@ export const getStaticPaths = async () => {
     })
 
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs`, { httpsAgent: agent })
-
+    
     const ids = data.map(blog => blog._id)
 
     //console.log(ids)

@@ -15,7 +15,7 @@ const Demo = () => {
 
   useEffect(() => {
     /* set custom user claims { admin } to UID in setadmin API */
-    // axios.get(getAbsoluteURL('/api/setadmin')).then(({message}) => Swal.fire('Custom User Claims', message, 'success'))
+    // axios.get(getAbsoluteURL('/api/auth/setadmin')).then(({message}) => Swal.fire('Custom User Claims', message, 'success'))
 
     const unsubscribe = axios.get(getAbsoluteURL('/api/blogs')).then(({data}) => setBlogs(data))
     return unsubscribe

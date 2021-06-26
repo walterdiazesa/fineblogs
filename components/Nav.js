@@ -6,6 +6,7 @@ import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
 import getAbsoluteURL from '../utils/getAbsoluteURL'
 import axios from "axios"
 import { useAuthUser } from 'next-firebase-auth'
+import getUserImage from "../utils/getUserImage";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -41,8 +42,8 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
       const {value: formValues} = await Swal.fire({
         title: 'Create Blog',
         html:
-          '<input id="swal-input1" class="swal2-input" placeholder="Title">' +
-          '<input id="swal-input2" class="swal2-textarea" placeholder="Body">',
+          '<input id="swal-input1" class="swal2-input" style="margin: 0; width: 100%;" placeholder="Title">' +
+          '<textarea id="swal-input2" class="overflow-y-hidden swal2-textarea" style="padding-top: 5px; padding-bottom: 0; margin-left: 0; margin-right: 0; width: 100%;" placeholder="Body">',
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Create Blog',
@@ -81,7 +82,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
           validationOrError = true
 
           const token = await AuthUser.getIdToken()
-          const { data } = await axios.post(getAbsoluteURL('/api/blog'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
+          const { data } = await axios.post(getAbsoluteURL('/api/blogs'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
 
           if (data.error) {
             addPostModalTitle = 'Failed adding blog'
@@ -187,7 +188,8 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                              /* https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80 */
+                              src={getUserImage(AuthUser)}
                               alt=""
                             />
                           </Menu.Button>
