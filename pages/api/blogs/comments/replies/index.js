@@ -34,13 +34,15 @@ const handler = async (req, res) => {
             const uuid = uuidv4()
             let createTime = Date.now()
     
+            const commentOwner = req.getUserJWT.email ? req.getUserJWT.email : req.getUserJWT.phoneNumber
+
             await getFirebaseAdmin().firestore().collection("blogs").doc(req.body.postuuid).collection('comments').doc(req.body.commentid).collection('replies').doc(uuid).set({
-                created_by: req.getUserJWT.email,
+                created_by: commentOwner,
                 body: req.body.body,
                 created_at: Date.now()
             }).then(({writeTime}) => createTime = writeTime)
     
-            const newReply = { _id: uuid, reply: { body: req.body.body, created_by: req.getUserJWT.email }, _date: createTime }
+            const newReply = { _id: uuid, reply: { body: req.body.body, created_by: commentOwner }, _date: createTime }
     
             return res.status(200).json(newReply)
             

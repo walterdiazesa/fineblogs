@@ -17,7 +17,7 @@ const Demo = () => {
     /* set custom user claims { admin } to UID in setadmin API */
     // axios.get(getAbsoluteURL('/api/auth/setadmin')).then(({message}) => Swal.fire('Custom User Claims', message, 'success'))
 
-    const unsubscribe = axios.get(getAbsoluteURL('/api/blogs')).then(({data}) => setBlogs(data))
+    const unsubscribe = axios.get('/api/blogs').then(({data}) => setBlogs(data))
     return unsubscribe
   }, [])
 
@@ -32,7 +32,7 @@ const Demo = () => {
         <Nav blogHookGet={blogs} blogHookSet={setBlogs} />
         <div className="grid grid-cols-1 2xl:grid-cols-3 2xl:px-80 my-3 2xl:my-5">
           {blogs && blogs.map(blog => {
-            return <BlogGrid key={blog._id} uuid={blog._id} date={blog._date} title={blog.blog.title} body={blog.blog.body} />
+            return <BlogGrid key={blog._id} uuid={blog._id} date={blog._date} title={blog.blog.title} body={blog.blog.body} img={blog.blog.img} />
           })}
         </div>
     </>

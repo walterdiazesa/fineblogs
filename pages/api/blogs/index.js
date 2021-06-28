@@ -2,6 +2,7 @@ import { getFirebaseAdmin } from "next-firebase-auth"
 import withAdminAuth from "../../middlewares/withAdminAuth"
 import { v4 as uuidv4 } from 'uuid'
 import bodyParser from "../../../utils/bodyParser"
+import storage from "../../../utils/storage"
 
 const handler = async (req, res) => {
     /* not needed bc i have my index set up for this case: .orderBy('created_at', 'desc')*/
@@ -21,7 +22,7 @@ const handler = async (req, res) => {
             return res.status(200).json({ error: 'Missed blog parameters' }) //400
         }
     
-        if (req.body.formValues.length !== 2) {
+        if (req.body.formValues.length < 2) {
             return res.status(200).json({ error: 'Title and body have to be especified' }) //400
         }
 
@@ -33,10 +34,11 @@ const handler = async (req, res) => {
             await getFirebaseAdmin().firestore().collection("blogs").doc(uuid).set({
                 title: req.body.formValues[0],
                 body: req.body.formValues[1],
-                created_at: Date.now()
+                created_at: Date.now(),
+                img: req.body.formValues[2]
             }).then(({writeTime}) => createTime = writeTime)
     
-            const newBlog = { _id: uuid, blog: { title: req.body.formValues[0], body : bodyParser(req.body.formValues[1]) }, _date: createTime }
+            const newBlog = { _id: uuid, blog: { title: req.body.formValues[0], body : bodyParser(req.body.formValues[1]), img: req.body.formValues[2] }, _date: createTime }
     
             return res.status(200).json(newBlog)
             

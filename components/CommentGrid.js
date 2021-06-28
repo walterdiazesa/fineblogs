@@ -7,17 +7,18 @@ import getAbsoluteURL from '../utils/getAbsoluteURL'
 import axios from "axios"
 import ReplyGrid from './ReplyGrid'
 import getUserImage from '../utils/getUserImage'
+import { getPhoneOrProvider, isAuth } from '../utils/isAuth'
 
 const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
 
     const AuthUser = useAuthUser()
 
-    const [displayName, setDisplayName] = useState(userEmail.substring(0, userEmail.lastIndexOf("@")))
+    const [displayName, setDisplayName] = useState(userEmail.includes("@") ? userEmail.substring(0, userEmail.lastIndexOf("@")) : userEmail)
     /* https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80 */
-    const [imgUser, setImgUser] = useState("../imgs/profiles/@.png")
+    const [imgUser, setImgUser] = useState(userEmail.includes("@") ? "../imgs/profiles/@.png" : "../imgs/profiles/phone.png")
 
     useEffect(async () => {
-        const { data } = await axios.get(getAbsoluteURL("/api/auth/firebaseuserinfo"), { params : { userEmail } }) /* .then instead of async? */
+        const { data } = await axios.get("/api/auth/firebaseuserinfo", { params : { userEmail } }) /* .then instead of async? */
 
         if (data.displayName) {
             setDisplayName(data.displayName)
@@ -48,7 +49,7 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
             try {
 
                 const token = await AuthUser.getIdToken()
-                const { data } = await axios.delete(getAbsoluteURL(`/api/blogs/comments/${id}`), { headers : { Authorization: `Bearer ${token}` }, params : { postuuid: uuid } })
+                const { data } = await axios.delete(`/api/blogs/comments/${id}`, { headers : { Authorization: `Bearer ${token}` }, params : { postuuid: uuid } })
     
                 if (data.error) {
                     Swal.fire("Error", data.error, "error")
@@ -71,7 +72,7 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
     const [likes, setLikes] = useState([])
     
     useEffect(async () => {
-        const { data } = await axios.get(getAbsoluteURL("/api/blogs/comments/replies"), { params : { postuuid : uuid, commentid: id } })
+        const { data } = await axios.get("/api/blogs/comments/replies", { params : { postuuid : uuid, commentid: id } })
 
         if (!data.error) {
             setReplies(data)
@@ -82,7 +83,7 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
     useEffect(async () => {
         //const { data } = await axios.get(getAbsoluteURL("/api/blogs/comments/likes/"), { params : { postuuid : uuid, commentid: id } })
 
-        const { data } = await axios.get(getAbsoluteURL(`/api/blogs/comments/likes/${uuid}/${id}`))
+        const { data } = await axios.get(`/api/blogs/comments/likes/${uuid}/${id}`)
 
         if (!data.error) {
             setLikes(data)
@@ -94,9 +95,9 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
 
     const [onceGetLike, setOnceGetLike] = useState(false)
 
-    if (likes.length > 0 && AuthUser.email && !onceGetLike) {
+    if (likes.length > 0 && isAuth(AuthUser) && !onceGetLike) {
         setOnceGetLike(true)
-        setCommentLikedByUser(likes.includes(AuthUser.email))
+        setCommentLikedByUser(likes.includes(getPhoneOrProvider(AuthUser)))
     }
     
     /*useEffect(() => {
@@ -119,7 +120,7 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
         }
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.post(getAbsoluteURL('/api/blogs/comments/replies'), { body: commentReplyRef.current.value, postuuid: uuid, commentid: id }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.post('/api/blogs/comments/replies', { body: commentReplyRef.current.value, postuuid: uuid, commentid: id }, { headers : { Authorization: `Bearer ${token}` } })
 
         setReplies([...replies, data])
 
@@ -142,7 +143,7 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
         setLikeLoading(true)
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.put(getAbsoluteURL('/api/blogs/comments/likes'), { bloguuid: uuid, commentuuid: id, isLikedByUser: isCommentLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.put('/api/blogs/comments/likes', { bloguuid: uuid, commentuuid: id, isLikedByUser: isCommentLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire("Error", data.error, "error")
@@ -160,12 +161,12 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
             <div className="block sm:flex">
                 <div className="flex"><img src={imgUser} alt={displayName} className="h-6 w-6 rounded-full" />
                 <p className="mx-2 textPink text-sm font-medium">{displayName} <span className="text-gray-400 text-sm font-light">{formatDate(date)}</span></p></div>
-                <div className={`flex justify-center ${AuthUser.email ? 'my-2 sm:my-0' : ''}`}>{AuthUser.email === userEmail && <TrashIcon className="h-5 w-5 text-gray-500 hover:text-gray-300 cursor-pointer sm:mr-1" aria-hidden="true" onClick={() => deleteComment()} />}
-                {AuthUser.email && <AnnotationIcon className="h-5 w-5 text-gray-500 hover:text-gray-300 cursor-pointer mx-4 sm:mx-0" aria-hidden="true" onClick={() => setReplyArea(!replyArea)} />}
-                {<MinusSmIcon className={`hidden sm:block m${AuthUser.email ? 'x' : 'r'}-2 h-5 w-5 text-gray-400`} aria-hidden="true" />}
-                {AuthUser.email && <button className="flex focus:outline-none" onClick={() => likeComment()} disabled={likeLoading}><p className={`mr-1  ${isCommentLikedByUser ? 'textWhite' : 'text-gray-400'} text-sm font-normal`}>{likesCount}</p>
+                <div className={`flex justify-center ${isAuth(AuthUser) ? 'my-2 sm:my-0' : ''}`}>{getPhoneOrProvider(AuthUser) === userEmail && <TrashIcon className="h-5 w-5 text-gray-500 hover:text-gray-300 cursor-pointer sm:mr-1" aria-hidden="true" onClick={() => deleteComment()} />}
+                {isAuth(AuthUser) && <AnnotationIcon className="h-5 w-5 text-gray-500 hover:text-gray-300 cursor-pointer mx-4 sm:mx-0" aria-hidden="true" onClick={() => setReplyArea(!replyArea)} />}
+                {<MinusSmIcon className={`hidden sm:block m${isAuth(AuthUser) ? 'x' : 'r'}-2 h-5 w-5 text-gray-400`} aria-hidden="true" />}
+                {isAuth(AuthUser) && <button className="flex focus:outline-none" onClick={() => likeComment()} disabled={likeLoading}><p className={`mr-1  ${isCommentLikedByUser ? 'textWhite' : 'text-gray-400'} text-sm font-normal`}>{likesCount}</p>
                 <HeartIconSolid className={`h-5 w-5 ${isCommentLikedByUser ? 'textWhite hover:text-gray-500' : 'text-gray-500 hover:text-gray-300'} cursor-pointer`} aria-hidden="true" /></button>}
-                {!AuthUser.email && <><p className="mr-1 text-gray-400 text-sm font-normal">{likesCount}</p>
+                {!isAuth(AuthUser) && <><p className="mr-1 text-gray-400 text-sm font-normal">{likesCount}</p>
                 <HeartIconSolid className="h-5 w-5 text-gray-400" aria-hidden="true" /></>}</div>
             </div>
             <div className="px-4">

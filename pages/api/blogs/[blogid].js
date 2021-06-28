@@ -64,8 +64,10 @@ const handler = async (req, res) => {
             } else if (req.body.fieldUpdated === 3) {
                 blogFields = { title: req.body.formValues[0], body: req.body.formValues[1] }
             }
-    
-            const blog = await getFirebaseAdmin().firestore().collection('blogs').doc(req.query.blogid).update(blogFields) //get
+        
+            const blogInputs = req.body.formValues[2] ? {...blogFields, img: req.body.formValues[2]} : blogFields
+
+            const blog = await getFirebaseAdmin().firestore().collection('blogs').doc(req.query.blogid).update(blogInputs) //get
             
             return res.status(200).json({ blogUp: req.body.formValues })
             

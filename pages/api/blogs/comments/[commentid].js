@@ -13,7 +13,7 @@ const handler = async (req, res) => {
             const commentRef = getFirebaseAdmin().firestore().collection('blogs').doc(req.query.postuuid).collection('comments').doc(req.query.commentid)
             const commentOwner = (await commentRef.get()).data()
     
-            if (req.getUserJWT.email !== commentOwner.created_by) {
+            if ((req.getUserJWT.email ? req.getUserJWT.email : req.getUserJWT.phoneNumber) !== commentOwner.created_by) {
                 return res.status(200).json({ error: "You're not the comment owner, you have no permissions to do this action" })
             }
     

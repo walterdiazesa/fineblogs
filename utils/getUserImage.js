@@ -8,6 +8,16 @@ export default function getUserImage(AuthUser) {
         if (AuthUser.photoURL) {
             return AuthUser.photoURL
         }
+
+        return `${process.env.NEXT_PUBLIC_HOST}/imgs/profiles/${userEmail ? userEmail.charAt(0).match(/[a-z]/i) ? userEmail.charAt(0).toLowerCase() : '@' : '@'}.png`
+    }
+
+    if (AuthUser.phoneNumber) {
+        return `${process.env.NEXT_PUBLIC_HOST}/imgs/profiles/phone.png`
+    }
+
+    if (!AuthUser.includes("@")) {
+        return `${process.env.NEXT_PUBLIC_HOST}/imgs/profiles/phone.png`
     }
 
     return `${process.env.NEXT_PUBLIC_HOST}/imgs/profiles/${userEmail ? userEmail.charAt(0).match(/[a-z]/i) ? userEmail.charAt(0).toLowerCase() : '@' : '@'}.png`

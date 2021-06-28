@@ -6,7 +6,14 @@ const handler = async (req, res) => {
         return res.status(200).json("user?")
     }
 
-    const firebaseUser = await getFirebaseAdmin().auth().getUserByEmail(req.query.userEmail)
+    let firebaseUser
+
+    if (req.query.userEmail.includes("@")) {
+        firebaseUser = await getFirebaseAdmin().auth().getUserByEmail(req.query.userEmail)
+    } else {
+        firebaseUser = await getFirebaseAdmin().auth().getUserByPhoneNumber(req.query.userEmail)
+    }
+
     let displayName = false, img = false
 
     if (firebaseUser.displayName) {

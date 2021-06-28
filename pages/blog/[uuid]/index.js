@@ -3,13 +3,16 @@ import https from 'https'
 import { formatDate } from '../../../utils/formatDates'
 import { useRouter } from 'next/router'
 import Nav from "../../../components/Nav"
-import { withAuthUser } from 'next-firebase-auth'
+import { getFirebaseAdmin, withAuthUser } from 'next-firebase-auth'
 import { PencilAltIcon, TrashIcon, HeartIcon } from "@heroicons/react/outline"
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid"
 import { useAuthUser } from 'next-firebase-auth'
 import getAbsoluteURL from "../../../utils/getAbsoluteURL"
 import { useEffect, useState } from "react"
 import CommentGrid from "../../../components/CommentGrid"
+import { getPhoneOrProvider, isAuth } from "../../../utils/isAuth"
+import bodyParser from "../../../utils/bodyParser"
+import storage from "../../../utils/storage"
 
 const index = ({ data, error, uuid }) => {
 
@@ -82,11 +85,11 @@ const index = ({ data, error, uuid }) => {
 
     useEffect(async () => {
 
-        if (AuthUser.email) {
-            setLikedByUser(data.likes.includes(AuthUser.email))
+        if (isAuth(AuthUser)) {
+            setLikedByUser(data.likes.includes(getPhoneOrProvider(AuthUser)))
         }
         
-    }, [AuthUser.email])
+    }, [AuthUser.email, AuthUser.phoneNumber])
 
     const [actionLoading, setActionLoading] = useState(false)
 
@@ -133,8 +136,12 @@ const index = ({ data, error, uuid }) => {
             
             try {
 
+                if (thisBlog.blog.img) {
+                    await storage.refFromURL(thisBlog.blog.img).delete()
+                }
+
                 const token = await AuthUser.getIdToken()
-                const { data } = await axios.delete(getAbsoluteURL(`/api/blogs/${uuid}`), {
+                const { data } = await axios.delete(`/api/blogs/${uuid}`, {
                     headers : {
                         Authorization: `Bearer ${token}`
                     },
@@ -182,9 +189,46 @@ const index = ({ data, error, uuid }) => {
         //alert(getAbsoluteURL('/api/blogs'))
     }
 
+    const [uploadFile, setUploadFile] = useState(true)
+    const [modalState, setModalState] = useState(false)
+
+    useEffect(() => {
+
+        if (modalState) {
+
+            if (uploadFile === false) {
+            document.querySelector(".swal2-confirm").disabled = true
+            document.querySelector("#fileUploadContainer").classList.add("animate-pulse")
+            document.querySelector("#fileUploadLoader").classList.remove("hidden")
+            
+            //document.querySelector("#imgForBlogModal").src = document.getElementById('swal-input3').files[0]
+            const fileImg = document.getElementById('swal-input3').files[0]
+            if (FileReader && fileImg) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    document.querySelector("#imgForBlogModal").src = fr.result;
+                }
+                fr.onerror = function () {
+                    document.querySelector("#imgForBlogModal").classList.add("hidden")
+                    document.getElementById('fileUploadSpan').innerText = "Img load fail, please select another image"
+                    document.querySelector("#imgForBlogModal").src = "/imgs/dummyimg.png"
+                }
+                fr.readAsDataURL(fileImg);
+            }
+            } else {
+            document.querySelector(".swal2-confirm").disabled = false
+            document.querySelector("#fileUploadLoader").classList.add("hidden")
+            document.querySelector("#fileUploadContainer").classList.remove("animate-pulse")
+            }
+        }
+
+    }, [uploadFile])
+
     async function editPost() {
 
         setActionLoading(true)
+
+        const blogImgUrl = thisBlog.blog.img || "/imgs/dummyimg.png"
 
         const {value: formValues} = await Swal.fire({
             title: 'Update Blog',
@@ -194,21 +238,83 @@ const index = ({ data, error, uuid }) => {
             imageHeight: 'auto',
             imageAlt: 'dummyimg',*/
             html:
-                `<img class="h-48 w-full object-cover rounded-md mb-5" src="/imgs/dummyimg.png" alt="dummyimg">` +
+                `<img id="imgForBlogModal" class="h-48 w-full object-cover rounded-md mb-5" src="${blogImgUrl}" alt="dummyimg">` +
+                '<span id="fileUploadError" class="textPink"></span>' +
+                `<div class="w-full mb-4 pt-2 bg-slatepurple text-white rounded-md cursor-pointer hover:bg-darkslatepurple">
+                    <label id="fileUploadContainer" class="flex justify-center">
+                    <svg id="fileUploadLoader" class="animate-spin mt-1.5 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="fileUploadSpan" class="text-white font-normal cursor-pointer hover:text-gray-300">Select a image</span>
+                    <input id="swal-input3" type="file" class="hidden" accept=".jpg, .jpeg"/>
+                    </label>
+                </div>` +
                 `<input id="swal-input1" class="swal2-input" style="margin: 0; width: 100%;" placeholder="Leave blank for no changes">` + /*value='${thisBlog.blog.title}'*/
                 `<textarea id="swal-input2" class="overflow-y-hidden swal2-textarea" style="padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; width: 100%;" placeholder="Leave blank for no changes">`, /*value='${thisBlog.blog.body}'*/
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Update Blog',
+            didDestroy: () => { /* didClose */
+                setModalState(false)
+            },
             didOpen: () => {
                 const content = Swal.getHtmlContainer()
                 content.querySelector("#swal-input1").value = thisBlog.blog.title
                 content.querySelector("#swal-input2").value = thisBlog.blog.body
+
+                setModalState(true)
+                var img = document.querySelector("#imgForBlogModal")
+
+                img.addEventListener('load', () => { 
+                    setUploadFile(true)
+                    
+                    if (document.getElementById('swal-input3').files.length === 1) {
+                        document.getElementById('fileUploadSpan').innerText = document.getElementById('swal-input3').files[0].name
+                        document.querySelector("#imgForBlogModal").classList.remove("hidden")
+                    }
+                })
+                img.addEventListener('error', function() {
+
+                    setUploadFile(false)
+                    
+                    document.getElementById('fileUploadSpan').innerText = "Img load fail, please select another image"
+                    document.querySelector("#imgForBlogModal").src = "/imgs/dummyimg.png"
+
+                    document.querySelector("#imgForBlogModal").classList.add("hidden")
+                })
+
+                document.getElementById('swal-input3').addEventListener('change', async (event) => {
+                    const imgFile = event.target.files[0];
+
+                    if (imgFile && imgFile.size / 1024 / 1024 > 1) {/* fileSize > 1mb */
+                    document.getElementById('swal-input3').value = ""
+                    document.getElementById("fileUploadError").innerText = "Image size too big (limit 1mb)"
+                    document.querySelector("#imgForBlogModal").classList.add("hidden")
+                    return
+                    } 
+                    
+                    document.getElementById("fileUploadError").innerText = ""
+                    
+                    if (imgFile) {
+                    setUploadFile(false)
+                    } else {
+                    
+                    document.querySelector("#imgForBlogModal").classList.add("hidden")
+                    document.getElementById('fileUploadSpan').innerText = "Select a image"
+                    //document.getElementById('swal-input3').value = document.querySelector("#imgForBlogModal").src
+                    //console.log(document.querySelector("#imgForBlogModal").src)
+                    //console.log(lastOkImage)
+                    }
+
+                    //await storage.ref().child(imgFile.name).put(imgFile)
+                });
             },
             preConfirm: () => {
               return [
                 document.getElementById('swal-input1').value,
-                document.getElementById('swal-input2').value
+                document.getElementById('swal-input2').value,
+                document.getElementById('swal-input3').files.length === 1 ? document.getElementById('swal-input3').files[0] : undefined
               ]
             }
         })
@@ -218,7 +324,7 @@ const index = ({ data, error, uuid }) => {
             let addPostModalBody = ""
             let fieldUpdated = 0 // 0 = none, 1 = title, 2 = body, 3 = title and body
             
-            if ((formValues[0] === thisBlog.blog.title || formValues[0].trim().length === 0) && (formValues[1] === thisBlog.blog.body || formValues[1].trim().length === 0)) {
+            if ((formValues[0] === thisBlog.blog.title || formValues[0].trim().length === 0) && (formValues[1] === thisBlog.blog.body || formValues[1].trim().length === 0) && !formValues[2]) {
     
                 addPostModalBody = "No changes"
     
@@ -236,8 +342,86 @@ const index = ({ data, error, uuid }) => {
                 let errorCallback = false
 
                 if (addPostModalBody === "Changes successfully applied") {
+
+                    if (formValues[2]) {
+                        const imgUploadBlog = formValues[2]
+                        const imgBlogName = imgUploadBlog.name.substring(0, imgUploadBlog.name.lastIndexOf(".")) + Date.now() + imgUploadBlog.name.substring(imgUploadBlog.name.lastIndexOf("."))
+            
+                        try {
+                          
+                          let timerInterval
+                          let fileUploadProgress = 0
+                          Swal.fire({
+                            title: "Uploading",
+                            html: '<p id="modalLoadingProgress" class="textWhite">Progress 0%.</p>' +
+                            '<div class="flex justify-center">' +
+                              `<svg class="mt-4 animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>` +
+                            '</div>',
+                            icon: "info",
+                            showConfirmButton: false,
+                            didOpen: () => {
+                              //document.getElementById("modalLoadingProgress").innerText =
+                              let dots = 1
+                              timerInterval = setInterval(() => {
+                                
+                                if (dots === 1) {
+                                  document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb).`
+                                } else if (dots === 2) {
+                                  document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb)..`
+                                } else if (dots === 3) {
+                                  document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb)...`
+                                  dots = 0
+                                }
+                                
+                                dots++
+                              }, 400)
+            
+                            },
+                            didDestroy: () => {
+                              clearInterval(timerInterval)
+                            }
+                          })
+
+                          if (thisBlog.blog.img) {
+                              try {
+                                await storage.refFromURL(thisBlog.blog.img).delete()
+                              } catch (error) {
+                                console.error(error.message)
+                              }
+                              
+                          }
+                          
+                          const imgStorageUpload = await storage.ref(`blogs/${imgBlogName}`).put(formValues[2])/*.on('state_changed', 
+                          function progress(snapshot) {
+            
+                            fileUploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                          }, function error(error) {
+            
+                            Swal.fire("Error", error.message, "error")
+                          }, function complete() {
+            
+                            
+                          })*/
+            
+                          formValues[2] = await imgStorageUpload.ref.getDownloadURL()
+                        } catch (error) {
+                            console.error(error.message)
+                            formValues[2] = undefined
+                            Swal.fire({
+                                title: "Error", 
+                                text: error.message, 
+                                icon: "error",
+                                confirmButtonText: "Understand"
+                            })
+                        }
+                        
+                    }
+
                     const token = await AuthUser.getIdToken()
-                    const { data } = await axios.put(getAbsoluteURL(`/api/blogs/${uuid}`), { formValues, fieldUpdated }, { headers : { Authorization: `Bearer ${token}` }/*, params : { blogid : uuid } */})
+                    const { data } = await axios.put(`/api/blogs/${uuid}`, { formValues, fieldUpdated }, { headers : { Authorization: `Bearer ${token}` }/*, params : { blogid : uuid } */})
                     errorCallback = data.error
 
                     if (!data.error) {
@@ -249,6 +433,17 @@ const index = ({ data, error, uuid }) => {
                             blogFields = { title: thisBlog.blog.title, body: formValues[1] }
                         } else if (fieldUpdated === 3) {
                             blogFields = { title: formValues[0], body: formValues[1] }
+                        }
+
+                        if (formValues[2]) {
+                           
+                            if (blogFields.length === undefined) {
+                                blogFields = { title: formValues[0] || thisBlog.blog.title, body: formValues[1] || thisBlog.blog.body, img: formValues[2] }
+                            } else {
+                                blogFields = { ...blogFields, img: formValues[2] }
+                            }
+                        } else {
+                            blogFields = {...blogFields, img: thisBlog.blog.img}
                         }
 
                         setThisBlog({ _id: thisBlog._id, blog: blogFields, _date: thisBlog._date })
@@ -285,7 +480,7 @@ const index = ({ data, error, uuid }) => {
         setActionLoading(true)
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.put(getAbsoluteURL('/api/blogs/likes'), { uuid, isLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.put('/api/blogs/likes', { uuid, isLikedByUser }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire("Error", data.error, "error")
@@ -314,7 +509,7 @@ const index = ({ data, error, uuid }) => {
         }
 
         const token = await AuthUser.getIdToken()
-        const { data } = await axios.post(getAbsoluteURL('/api/blogs/comments'), { body: document.getElementById("inputCommentBody").value, uuid: uuid }, { headers : { Authorization: `Bearer ${token}` } })
+        const { data } = await axios.post('/api/blogs/comments', { body: document.getElementById("inputCommentBody").value, uuid: uuid }, { headers : { Authorization: `Bearer ${token}` } })
 
         if (data.error) {
             Swal.fire({
@@ -338,9 +533,9 @@ const index = ({ data, error, uuid }) => {
     return (
         <>
             <Nav uuid={uuid} />
-            <div className={`text-center ${AuthUser.email ? '' : 'pb-0'} p-10`}>
+            <div className={`text-center ${isAuth(AuthUser) ? '' : 'pb-0'} p-10`}>
                 <p className="textPink font-semibold uppercase pb-4 md:pb-0">{formatDate(thisBlog._date)}</p>
-                <h1 className={`textYellow text-4xl font-bold ${!AuthUser.claims.admin || !AuthUser.email ? 'pb-0' : 'pb-4'}`}>{thisBlog.blog.title}</h1>
+                <h1 className={`textYellow text-4xl font-bold ${!AuthUser.claims.admin || !isAuth(AuthUser) ? 'pb-0' : 'pb-4'}`}>{thisBlog.blog.title}</h1>
                 {AuthUser.claims.admin && <div className="mb-4">
                     <button className={`mx-3 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none ${actionLoading && 'animate-pulse'}`} onClick={() => editPost()}
                     onMouseOver={() => setEditHover(true)} onMouseLeave={() => setEditHover(false)} disabled={actionLoading}>
@@ -353,7 +548,7 @@ const index = ({ data, error, uuid }) => {
                         <TrashIcon className={`h-6 w-6 ${trashHover && !actionLoading && 'animate-bounce'}`} aria-hidden="true" />
                     </button>
                 </div>}
-                {!AuthUser.claims.admin && AuthUser.email ? 
+                {!AuthUser.claims.admin && isAuth(AuthUser) ? 
                 <div className="mb-4">
                     <button className={`mx-3 p-1 rounded-full ${isLikedByUser ? 'text-white hover:text-gray-400' : 'text-gray-400 hover:text-white'} focus:outline-none`}
                     onClick={() => likePost()} onMouseOver={() => setLikeHover(true)} onMouseLeave={() => setLikeHover(false)} disabled={actionLoading}>
@@ -374,11 +569,11 @@ const index = ({ data, error, uuid }) => {
 
             <div className="px-10">
                 <div className={`text-center md:px-44 pb-3`}>
-                    {AuthUser.email && <><textarea id="inputCommentBody" className="w-full px-3 py-2 rounded-lg focus:outline-none border-slatebluenav focus:border-white resize-none border-2 bg-slateblueinput textWhite" rows="4" placeholder="Write your comment..."></textarea>
+                    {isAuth(AuthUser) && <><textarea id="inputCommentBody" className="w-full px-3 py-2 rounded-lg focus:outline-none border-slatebluenav focus:border-white resize-none border-2 bg-slateblueinput textWhite" rows="4" placeholder="Write your comment..."></textarea>
                     <div className="text-right">
                         <button className="text-gray-300 bgNavItemHover hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => createComment()}>Submit Comment</button>
                     </div></>}
-                    <div className={`${AuthUser.email ? 'py-4' : ''}`}>
+                    <div className={`${isAuth(AuthUser) ? 'py-4' : ''}`}>
                         {commentHookGet.map((comment) => {
                             return <CommentGrid key={comment._id} updateComments={deleteComment} uuid={uuid} id={comment._id} userEmail={comment.comment.created_by} date={comment._date} body={comment.comment.body} />
                         })}
@@ -395,8 +590,40 @@ export const getStaticProps = async (context) => {
     const uuid = context.params.uuid
 
     try {
+        
+        //const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs/${uuid}`, { params : { getlikes : true, getcomments: true } })
 
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs/${uuid}`, { params : { getlikes : true, getcomments: true } })
+        /* ==================================================*/
+        /* ================ INSTEAD OF AXIOS ================*/
+        /* ==================================================*/
+
+        const blogRef = getFirebaseAdmin().firestore().collection('blogs').doc(uuid)
+        const blog = await blogRef.get()
+    
+        let likes = []
+        let comments = []
+    
+        const likesDocs = (await blogRef.collection('likes').get()).docs
+    
+        if (likesDocs) {
+            likes = likesDocs.map((like) => {
+                return like.id
+            })
+        }
+    
+        const commentsDocs = (await blogRef.collection('comments').orderBy("created_at", "desc").get()).docs
+    
+        if (commentsDocs) {
+            comments = commentsDocs.map(comment => {
+                return { _id: comment.id, comment: comment.data(), _date: comment.createTime } 
+            })
+        }
+    
+        const data = JSON.parse(JSON.stringify({ _id: blog.id, blog: blog.data(), _date: blog.createTime, likes, comments }))
+
+        /* ==================================================*/
+        /* ================ INSTEAD OF AXIOS ================*/
+        /* ==================================================*/
         
         return {
             props: {
@@ -425,7 +652,11 @@ export const getStaticPaths = async () => {
         rejectUnauthorized: false
     })
 
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs`, { httpsAgent: agent })
+    //const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs`, { httpsAgent: agent })
+    const blogs = (await getFirebaseAdmin().firestore().collection('blogs').orderBy('created_at', 'desc').get()).docs
+    const data = blogs.map((blog) => {
+        return { _id: blog.id, blog: {...blog.data(), body: bodyParser(blog.data().body)}, _date: blog.createTime }
+    })
     
     const ids = data.map(blog => blog._id)
 
@@ -437,7 +668,7 @@ export const getStaticPaths = async () => {
     
     return {
         paths,
-        fallback: true
+        fallback: 'blocking'//true
     }
 
 }

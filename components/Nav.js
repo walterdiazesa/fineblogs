@@ -1,12 +1,15 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from 'next/link'
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
+//import { CheckIcon, XIcon } from "@heroicons/react/solid";
 import getAbsoluteURL from '../utils/getAbsoluteURL'
 import axios from "axios"
 import { useAuthUser } from 'next-firebase-auth'
 import getUserImage from "../utils/getUserImage";
+import { getPhoneOrProvider, isAuth } from "../utils/isAuth";
+import storage from "../utils/storage";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -36,21 +39,120 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
     }, false)
   }, [])*/
 
+  const [uploadFile, setUploadFile] = useState(true)
+  const [modalState, setModalState] = useState(false)
+
+  useEffect(() => {
+
+    if (modalState) {
+
+        if (uploadFile === false) {
+          document.querySelector(".swal2-confirm").disabled = true
+          document.querySelector("#fileUploadContainer").classList.add("animate-pulse")
+          document.querySelector("#fileUploadLoader").classList.remove("hidden")
+          
+          //document.querySelector("#imgForBlogModal").src = document.getElementById('swal-input3').files[0]
+          const fileImg = document.getElementById('swal-input3').files[0]
+          if (FileReader && fileImg) {
+              var fr = new FileReader();
+              fr.onload = function () {
+                document.querySelector("#imgForBlogModal").src = fr.result;
+              }
+              fr.onerror = function () {
+                document.querySelector("#imgForBlogModal").classList.add("hidden")
+                document.getElementById('fileUploadSpan').innerText = "Img load fail, please select another image"
+              }
+              fr.readAsDataURL(fileImg);
+          }
+        } else {
+          document.querySelector(".swal2-confirm").disabled = false
+          document.querySelector("#fileUploadLoader").classList.add("hidden")
+          document.querySelector("#fileUploadContainer").classList.remove("animate-pulse")
+        }
+    }
+
+  }, [uploadFile])
+
   async function createBlog(btnname) {
     if (btnname === "Create Blog") {
                             
       const {value: formValues} = await Swal.fire({
         title: 'Create Blog',
         html:
+          //'<input id="swal-input3" type="file" accept=".jpg, .jpeg, .png" />' +
+          '<img id="imgForBlogModal" class="h-48 w-full object-cover rounded-md mb-5 hidden" src="/imgs/dummyimg.png" alt="dummyimg">' +
+          '<span id="fileUploadError" class="textPink"></span>' +
+          `<div class="w-full mb-4 pt-2 bg-slatepurple text-white rounded-md cursor-pointer hover:bg-darkslatepurple">
+            <label id="fileUploadContainer" class="flex justify-center">
+              <svg id="fileUploadLoader" class="animate-spin mt-1.5 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span id="fileUploadSpan" class="text-white font-normal cursor-pointer hover:text-gray-300">Select a image</span>
+              <input id="swal-input3" type="file" class="hidden" accept=".jpg, .jpeg"/>
+            </label>
+          </div>` +
           '<input id="swal-input1" class="swal2-input" style="margin: 0; width: 100%;" placeholder="Title">' +
           '<textarea id="swal-input2" class="overflow-y-hidden swal2-textarea" style="padding-top: 5px; padding-bottom: 0; margin-left: 0; margin-right: 0; width: 100%;" placeholder="Body">',
-        focusConfirm: false,
+        focusConfirm: true,
         showCancelButton: true,
         confirmButtonText: 'Create Blog',
+        didDestroy: () => { /* didClose */
+          setModalState(false)
+        },
+        didOpen: () => {
+          setModalState(true)
+          var img = document.querySelector("#imgForBlogModal")
+
+          img.addEventListener('load', () => { 
+            setUploadFile(true)
+            //console.log("completo por load")
+
+            if (document.getElementById('swal-input3').files.length === 1) {
+              document.getElementById('fileUploadSpan').innerText = document.getElementById('swal-input3').files[0].name
+              document.querySelector("#imgForBlogModal").classList.remove("hidden")
+            }
+            
+          })
+          img.addEventListener('error', function() {
+
+              setUploadFile(false)
+              
+              document.getElementById('fileUploadSpan').innerText = "Img load fail, please select another image"
+
+              document.querySelector("#imgForBlogModal").classList.add("hidden")
+          })
+
+          document.getElementById('swal-input3').addEventListener('change', async (event) => {
+            const imgFile = event.target.files[0];
+
+            if (imgFile && imgFile.size / 1024 / 1024 > 1) {/* fileSize > 1mb */
+              document.getElementById('swal-input3').value = ""
+              document.getElementById("fileUploadError").innerText = "Image size too big (limit 1mb)"
+              document.querySelector("#imgForBlogModal").classList.add("hidden")
+              return
+            } 
+            
+            document.getElementById("fileUploadError").innerText = ""
+            //console.log(fileList);
+            if (imgFile) {
+              setUploadFile(false)
+            } else {
+              document.querySelector("#imgForBlogModal").classList.add("hidden")
+              document.getElementById('fileUploadSpan').innerText = "Select a image"
+              //document.getElementById('swal-input3').value = document.querySelector("#imgForBlogModal").src
+              //console.log(document.querySelector("#imgForBlogModal").src)
+              //console.log(lastOkImage)
+            }
+
+            //await storage.ref().child(imgFile.name).put(imgFile)
+          });
+        },
         preConfirm: () => {
           return [
             document.getElementById('swal-input1').value,
-            document.getElementById('swal-input2').value
+            document.getElementById('swal-input2').value,
+            document.getElementById('swal-input3').files.length === 1 ? document.getElementById('swal-input3').files[0] : undefined
           ]
         }
       })
@@ -58,14 +160,13 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
       if (formValues) {
 
         //axios.get(getAbsoluteURL('/api/blogs')).then(data => console.log(data))
-
         let addPostModalTitle = ""
         let addPostModalBody = ""
         let addPostModalIcon = "info"
         let validationOrError = false
         let addPostFailed = false
 
-        if (formValues.length !== 2) {
+        if (formValues.length < 2) {
 
           addPostModalBody = "Can't leave blank inputs"
 
@@ -81,9 +182,81 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
 
           validationOrError = true
 
-          const token = await AuthUser.getIdToken()
-          const { data } = await axios.post(getAbsoluteURL('/api/blogs'), { formValues }, { headers : { Authorization: `Bearer ${token}` } })
+          /* var bodyFormData = new FormData()
+          bodyFormData.append('title', formValues[0])
+          bodyFormData.append('body', formValues[1])
+          bodyFormData.append('images', formValues[2]) 
+          const { data } = await axios.post(getAbsoluteURL('/api/blogs'), bodyFormData, { headers : { Authorization: `Bearer ${token}`, "Content-Type" : "multipart/form-data" } }) */
+          
+          if (formValues[2]) {
+            const imgUploadBlog = formValues[2]
+            const imgBlogName = imgUploadBlog.name.substring(0, imgUploadBlog.name.lastIndexOf(".")) + Date.now() + imgUploadBlog.name.substring(imgUploadBlog.name.lastIndexOf("."))
 
+            try {
+              
+              let timerInterval
+              let fileUploadProgress = 0
+              Swal.fire({
+                title: "Uploading",
+                html: '<p id="modalLoadingProgress" class="textWhite">Progress 0%.</p>' +
+                '<div class="flex justify-center">' +
+                  `<svg class="mt-4 animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>` +
+                '</div>',
+                icon: "info",
+                showConfirmButton: false,
+                didOpen: () => {
+                  //document.getElementById("modalLoadingProgress").innerText =
+                  let dots = 1
+                  timerInterval = setInterval(() => {
+                    
+                    if (dots === 1) {
+                      document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb).`
+                    } else if (dots === 2) {
+                      document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb)..`
+                    } else if (dots === 3) {
+                      document.getElementById("modalLoadingProgress").innerText = `Uploading ${imgUploadBlog.name} (${(imgUploadBlog.size / 1024) | 0} kb)...`
+                      dots = 0
+                    }
+                    
+                    dots++
+                  }, 400)
+
+                },
+                didDestroy: () => {
+                  clearInterval(timerInterval)
+                }
+              })
+              const imgStorageUpload = await storage.ref(`blogs/${imgBlogName}`).put(formValues[2])/*.on('state_changed', 
+              function progress(snapshot) {
+
+                fileUploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              }, function error(error) {
+
+                Swal.fire("Error", error.message, "error")
+              }, function complete() {
+
+                
+              })*/
+
+              formValues[2] = await imgStorageUpload.ref.getDownloadURL()
+            } catch (error) {
+              formValues[2] = undefined
+              Swal.fire({
+                title: "Error", 
+                text: error.message, 
+                icon: "error",
+                confirmButtonText: "Understand"
+              })
+            }
+            
+          }
+
+          const token = await AuthUser.getIdToken()
+          
+          const { data } = await axios.post('/api/blogs', { formValues }, { headers : { Authorization: `Bearer ${token}` } })
           if (data.error) {
             addPostModalTitle = 'Failed adding blog'
             addPostModalBody = data.error
@@ -96,7 +269,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
 
             if (blogHookGet) {
               // blogHookSet(blogHookGet.concat({ _id: data._id, blog: { title: data.blog.title, body: data.blog.body }, _date: data._date })) // lo agrega de último
-              blogHookSet([{ _id: data._id, blog: { title: data.blog.title, body: data.blog.body }, _date: data._date }, ...blogHookGet]) // Lo agrega de primero
+              blogHookSet([{ _id: data._id, blog: { title: data.blog.title, body: data.blog.body, img: data.blog.img }, _date: data._date }, ...blogHookGet]) // Lo agrega de primero
             }
             //setBlogs(add)
           }
@@ -171,13 +344,13 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
                   </div>
                 </div>
               </div>
-              {AuthUser.email ? (
+              {isAuth(AuthUser) ? (
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                   {/*<button className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button>*/}
-                  <p className="text-white hidden md:block">{/*!isMobile && */AuthUser.email}</p>
+                  <p className="text-white hidden md:block">{getPhoneOrProvider(AuthUser)}</p>
 
                   {/* Profile dropdown */}
                   <Menu as="div" className="ml-3 relative">
@@ -206,7 +379,7 @@ export default function Nav({ blogHookGet, blogHookSet, uuid }) {
                         >
                           <Menu.Items
                             static
-                            className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bgNavItem ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bgNavItem ring-1 ring-black ring-opacity-5 focus:outline-none 2xl:z-50"
                           >
                             <Menu.Item>
                               {({ active }) => (

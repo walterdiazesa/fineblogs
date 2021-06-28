@@ -14,7 +14,9 @@ const handler = async (req, res) => {
             const replyRef = getFirebaseAdmin().firestore().collection('blogs').doc(req.query.bloguuid).collection('comments').doc(req.query.commentuuid).collection("replies").doc(req.query.replyid)
             const replyOwner = (await replyRef.get()).data()
     
-            if (req.getUserJWT.email !== replyOwner.created_by) {
+
+
+            if ((req.getUserJWT.email ? req.getUserJWT.email : req.getUserJWT.phoneNumber) !== replyOwner.created_by) {
                 return res.status(200).json({ error: "You're not the reply owner, you have no permissions to do this action" })
             }
     

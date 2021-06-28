@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }) {
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Baloo+Tammudu+2:wght@400;700&display=swap" rel="stylesheet" />
           <script async src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-          <link rel="shortcut icon" href="favicon.ico" />
+          {/* <link rel="shortcut icon" href="favicon.ico" /> */}
           <title>walterdiazesa</title>
       </Head>
       <Component {...pageProps} />

@@ -11,7 +11,9 @@ const handler = async (req, res) => {
     
         try {
             
-            const docRef = getFirebaseAdmin().firestore().collection('blogs').doc(req.body.uuid).collection('likes').doc(req.getUserJWT.email)
+            const likeOwner = req.getUserJWT.email ? req.getUserJWT.email : req.getUserJWT.phoneNumber
+
+            const docRef = getFirebaseAdmin().firestore().collection('blogs').doc(req.body.uuid).collection('likes').doc(likeOwner)
     
             let nowLiked
     
