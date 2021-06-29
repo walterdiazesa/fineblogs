@@ -37,6 +37,16 @@ export const getServerSideProps = async (context) => {
   const data = blogs.map((blog) => {
       return JSON.parse(JSON.stringify({ _id: blog.id, blog: {...blog.data(), body: bodyParser(blog.data().body)}, _date: blog.createTime }))
   })
+
+  /* const likes = data.map(async (blog) => {
+    const likes  = (await getFirebaseAdmin().firestore().collection('blogs').doc(blog._id).collection('likes').get()).docs.length
+    return likes
+  })
+
+  const comments = data.map(async (blog) => {
+    const comments  = (await getFirebaseAdmin().firestore().collection('blogs').doc(blog._id).collection('comments').get()).docs.length
+    return comments
+  }) */
     
   return {
       props: {

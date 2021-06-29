@@ -26,13 +26,13 @@ const CommentGrid = ({ uuid, id, body, date, userEmail, updateComments }) => {
 
         if (data.img) {
             setImgUser(data.img)
-            console.log("=== data.img ===")
-            console.log(data.img)
+            /* console.log("=== data.img ===")
+            console.log(data.img) */
         } else {
             setImgUser(getUserImage(userEmail))
-            console.log("=== getUserImage(userEmail) ===")
+            /* console.log("=== getUserImage(userEmail) ===")
             console.log("Useremail: " + userEmail)
-            console.log(getUserImage(userEmail))
+            console.log(getUserImage(userEmail)) */
         }
 
     }, [])
