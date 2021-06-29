@@ -1,5 +1,8 @@
 import { getFirebaseAdmin, verifyIdToken } from "next-firebase-auth"
 import withUserAuth from "../../../middlewares/withUserAuth"
+import initAuth from "../../../../utils/initAuth"
+
+initAuth()
 
 const handler = async (req, res) => {
     

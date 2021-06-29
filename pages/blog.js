@@ -8,24 +8,16 @@ import Nav from '../components/Nav'
 import axios from "axios"
 import getAbsoluteURL from '../utils/getAbsoluteURL'
 import BlogGrid from '../components/BlogGrid'
+import bodyParser from '../utils/bodyParser'
 
-const Demo = () => {
+const Demo = ({ data }) => {
 
-  const [blogs, setBlogs] = useState([])
-
-  useEffect(() => {
-    /* set custom user claims { admin } to UID in setadmin API */
-    // axios.get(getAbsoluteURL('/api/auth/setadmin')).then(({message}) => Swal.fire('Custom User Claims', message, 'success'))
-
-    const unsubscribe = axios.get('/api/blogs').then(({data}) => setBlogs(data))
-    return unsubscribe
-  }, [])
+  const [blogs, setBlogs] = useState(data)
 
   /* useEffect(() => {
-    blogs.map((blog) => {
-      console.log(blog)
-    })
-  }, [blogs]) */
+    const unsubscribe = axios.get('/api/blogs').then(({data}) => setBlogs(data))
+    return unsubscribe
+  }, []) */
   
   return (
     <>
@@ -39,6 +31,18 @@ const Demo = () => {
   )
 }
 
-export const getServerSideProps = withAuthUserTokenSSR()()
+export const getServerSideProps = async (context) => {
+  
+  const blogs = (await getFirebaseAdmin().firestore().collection('blogs').orderBy('created_at', 'desc').get()).docs
+  const data = blogs.map((blog) => {
+      return JSON.parse(JSON.stringify({ _id: blog.id, blog: {...blog.data(), body: bodyParser(blog.data().body)}, _date: blog.createTime }))
+  })
+    
+  return {
+      props: {
+          data
+      }
+  }
+}
 
 export default withAuthUser()(Demo)

@@ -1,4 +1,7 @@
 import { getFirebaseAdmin } from "next-firebase-auth"
+import initAuth from "../../../utils/initAuth"
+
+initAuth()
 
 const handler = async (req, res) => {
     /* not needed bc i have my index set up for this case: .orderBy('created_at', 'desc')*/
