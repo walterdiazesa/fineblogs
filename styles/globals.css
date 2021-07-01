@@ -2,17 +2,17 @@
   --c1: hsl(248, 53%, 58%);
   --c2: hsl(180, 100%, 25%);
   --c3: hsl(0, 0%, 15%);
-  --c4: #FF6495;
-  --c5: #371BB1;
-  --c6: #F4DB7D;
-  --c7: #E5BACE;
-  --c8: #05F4B7;
+  --c4: #ff6495;
+  --c5: #371bb1;
+  --c6: #f4db7d;
+  --c7: #e5bace;
+  --c8: #05f4b7;
   --w: #fff;
   --pure-material-primary-rgb: var(--c5);
 }
 
 #resetFont p {
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
 }
 
 .bg-slateblue {
@@ -50,7 +50,8 @@
   background-color: hsl(248, 80%, 57%);
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
   /* font-family: 'Baloo Tammudu 2', cursive; */
 }
@@ -61,13 +62,13 @@ html {
 
 body {
   margin: 0;
-  padding: 0!important;
+  padding: 0 !important;
   background-color: var(--c1);
   /* font-family: 'Baloo Tammudu 2', cursive; */
 }
 
 #fileUploadSpan {
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
 }
 
 /*=======================================================
@@ -75,93 +76,96 @@ body {
 =======================================================*/
 
 .swal2-title {
-  color: var(--c6)!important;
-  }
-  
-  .swal2-html-container {
-  color: var(--w)!important;
-  }
-  
-  .swal2-popup {
-  background: var(--c1)!important;
-  }
-  
-  .swal2-styled.swal2-confirm {
-  background-color: var(--c5)!important;/*important*/
-  color: var(--w)!important;
+  color: var(--c6) !important;
+}
+
+.swal2-html-container {
+  color: var(--w) !important;
+}
+
+.swal2-popup {
+  background: var(--c1) !important;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: var(--c5) !important; /*important*/
+  color: var(--w) !important;
   font-weight: bold;
-  }
-  
-  .swal2-textarea, .swal2-text {
-    color: var(--w)!important;
-  }
+}
+
+.swal2-textarea,
+.swal2-text {
+  color: var(--w) !important;
+}
 
 /*=======================================================
 ==================== FirebaseAuthUI =====================
 =======================================================*/
 
 .firebaseui-container {
-  background-color: var(--c1)!important;
+  background-color: var(--c1) !important;
 }
 
 .mdl-shadow--2dp {
-  box-shadow: none!important;
+  box-shadow: none !important;
 }
 
 .firebaseui-card-header {
-  display: none!important;
+  display: none !important;
 }
 
 .firebaseui-label {
-  color: rgb(214, 214, 214)!important;
+  color: rgb(214, 214, 214) !important;
 }
 
 .firebaseui-textfield.mdl-textfield .firebaseui-input {
-  border-color: var(--c5)!important;
+  border-color: var(--c5) !important;
 }
 
-.firebaseui-input, .firebaseui-input-invalid {
-  color: var(--w)!important
+.firebaseui-input,
+.firebaseui-input-invalid {
+  color: var(--w) !important;
 }
 
 .mdl-button--primary.mdl-button--primary {
-  color: var(--w)!important;
+  color: var(--w) !important;
 }
 
 .mdl-button--raised.mdl-button--colored {
-  background: var(--c5)!important;
+  background: var(--c5) !important;
 }
 
 .firebaseui-error {
-  color: var(--c7)!important;
+  color: var(--c7) !important;
 }
 
 .firebaseui-tos {
-  color: var(--c7)!important;
+  color: var(--c7) !important;
 }
 
 .firebaseui-id-country-selector-code {
-  color: var(--w)!important;
+  color: var(--w) !important;
 }
 
 .firebaseui-list-item button.firebaseui-idp-password {
-  background-color: var(--c4)!important;
+  background-color: var(--c4) !important;
 }
 
 .firebaseui-list-item button.firebaseui-idp-phone {
-  background-color: var(--c2)!important;
+  background-color: var(--c2) !important;
 }
 
 .firebaseui-list-item button {
-  border-radius: 5px!important;
-  padding-top: 13px!important; padding-bottom: 5px!important;
+  border-radius: 5px !important;
+  padding-top: 13px !important;
+  padding-bottom: 5px !important;
 }
 
 .firebaseui-idp-text.firebaseui-idp-text-long {
-  font-family: 'Baloo Tammudu 2', cursive!important;
+  font-family: "Baloo Tammudu 2", cursive !important;
 }
 .firebaseui-idp-icon-wrapper {
-  font-family: 'Baloo Tammudu 2', cursive!important;
+  font-family: "Baloo Tammudu 2", cursive !important;
 }
 
 li.firebaseui-list-item::before {
@@ -179,12 +183,12 @@ li.firebaseui-list-item::before {
 
 h1 {
   color: var(--c6);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
 }
 
 h2 {
   color: var(--w);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
 }
 
 span {
@@ -200,21 +204,21 @@ span {
 
 .cardend h3 {
   color: var(--w);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
   margin: 0 0;
   padding: 0 0;
 }
 
 .cardend p {
   color: var(--w);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
   margin: 0 0;
   padding: 0 4%;
 }
 
 .cardend span {
   color: var(--c7);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
 }
 
 .cardend img.front {
@@ -230,90 +234,100 @@ span {
 }
 
 .cardend img.fullstack {
-width: 94%;
+  width: 94%;
 }
 
 .cardend ul {
   color: var(--w);
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
   list-style: none;
   padding-right: 8%;
 }
 
 .cardend a {
-color: var(--c7);
+  color: var(--c7);
 }
 
 @media screen and (min-width: 756px) {
+  .cardend div.body {
+    width: 50%;
+  }
+  .cardend div.img {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+  }
 
-.cardend div.body {
-  width: 50%;
-}
-.cardend div.img {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-}
+  .container .cardend.first div.body {
+    order: 1;
+  }
+  .container .cardend.first div.img {
+    order: 2;
+  }
 
-.container .cardend.first div.body { order: 1; }
-.container .cardend.first div.img { order: 2; }
+  .container .cardend.third div.body {
+    order: 1;
+  }
+  .container .cardend.third div.img {
+    order: 2;
+  }
 
-.container .cardend.third div.body { order: 1; }
-.container .cardend.third div.img { order: 2; }
+  .cardend.fullstack {
+    display: block;
+  }
 
-.cardend.fullstack {
-  display: block;
-}
+  .cardend.fullstack div.img,
+  .cardend.fullstack div.body {
+    width: 60%;
+    margin: 0 auto;
+  }
 
-.cardend.fullstack div.img, .cardend.fullstack div.body {
-  width: 60%;
-  margin: 0 auto;
-}
+  .cardend.fullstack div.body {
+    padding-top: 3.5%;
+    padding-bottom: 0.5%;
+  }
 
-.cardend.fullstack div.body {
-  padding-top: 3.5%;
-  padding-bottom: 0.5%;
-}
+  .cardend div.body li,
+  .cardend div.body p,
+  .cardend div.body h3 {
+    text-align: justify;
+    padding-left: 20%;
+  }
 
-.cardend div.body li, .cardend div.body p, .cardend div.body h3 {
-  text-align: justify;
-  padding-left: 20%;
-}
+  .cardend {
+    display: flex;
+    align-items: center;
+  }
 
-.cardend {
-  display: flex;
-  align-items: center;
-}
+  .cardend.cardend.fullstack {
+    text-align: justify;
+  }
+  .cardend.cardend.fullstack ul {
+    text-align: justify;
+    display: inline-block;
+    padding: 0 auto;
+  }
 
-.cardend.cardend.fullstack {
-  text-align: justify;
-}
-.cardend.cardend.fullstack ul {
-  text-align: justify;
-  display: inline-block;
-  padding: 0 auto;
-}
+  .cardend.cardend.fullstack div.projectsbody {
+    text-align: center;
+    padding-bottom: 1%;
+  }
 
-.cardend.cardend.fullstack div.projectsbody {
-  text-align: center;
-  padding-bottom: 1%;
-}
+  .projectsh2 {
+    margin-bottom: 0;
+  }
 
-.projectsh2 {
-  margin-bottom: 0;
-}
+  h1 {
+    font-size: 3.5em;
+    margin-bottom: 0;
+    line-height: 32px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+  }
 
-h1 {
-  font-size: 3.5em;
-  margin-bottom: 0;
-  line-height: 32px;
-  padding-top: 25px;
-  padding-bottom: 25px;
-}
-
-h2 {
-  font-size: 1.75em;
-}
+  h2 {
+    font-size: 1.75em;
+  }
 }
 
 li::before {
@@ -322,7 +336,7 @@ li::before {
   display: inline-block;
   width: 1em;
   margin-left: -1em;
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-family: "Baloo Tammudu 2", cursive;
   font-weight: 900;
 }
 
@@ -344,18 +358,18 @@ form span {
 }
 
 .field__input {
-  color: var(--w)
+  color: var(--w);
 }
 
 .cardend.fullstack h3 {
-color: var(--c7);
-font-family: 'Baloo Tammudu 2', cursive;
-margin: 0 0;
-padding: 0 0;
+  color: var(--c7);
+  font-family: "Baloo Tammudu 2", cursive;
+  margin: 0 0;
+  padding: 0 0;
 }
 
 .cardend.fullstack span {
-color: var(--c7);
-font-family: 'Baloo Tammudu 2', cursive;
-font-weight: 900;
+  color: var(--c7);
+  font-family: "Baloo Tammudu 2", cursive;
+  font-weight: 900;
 }

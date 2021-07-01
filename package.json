@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "prepare": "husky install",
+    "check-types": "tsc --pretty --noEmit",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "format": "prettier --write .",
+    "test-all": "npm run check-format && npm run check-lint && npm run check-types && npm run build"
   },
   "dependencies": {
     "@headlessui/react": "^1.2.0",
@@ -20,14 +26,24 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-firebaseui": "^5.0.2",
+    "sweetalert2": "^11.0.18",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/node": "^15.3.0",
     "@types/react": "^17.0.5",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.1",
+    "@typescript-eslint/parser": "^4.28.1",
     "autoprefixer": "^10.2.6",
+    "eslint": "^7.29.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-react": "^7.24.0",
     "postcss": "^8.3.4",
+    "prettier": "^2.3.2",
     "tailwindcss": "^2.1.4",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "husky": "^7.0.0"
   }
 }
