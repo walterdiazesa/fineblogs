@@ -2,6 +2,7 @@ import { AuthUser, getFirebaseAdmin } from "next-firebase-auth";
 import withUserAuth from "../../../../middlewares/withUserAuth";
 import initAuth from "../../../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../../../utils/redis";
 
 interface customrequest extends NextApiRequest {
   getUserJWT: AuthUser;
@@ -15,21 +16,40 @@ initAuth();
 
 const handler = async (req: customrequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    /* not needed bc i have my index set up for this case: .orderBy('created_at', 'desc')*/
-    const likes = (
-      await getFirebaseAdmin()
-        .firestore()
-        .collection("blogs")
-        .doc(req.query.postuuid)
-        .collection("comments")
-        .doc(req.query.commentid)
-        .collection("likes")
-        .get()
-    ).docs;
+    let likeData;
 
-    const likesList = likes.map((like) => like.id);
+    const redisLikes = await redis.hkeys(
+      `likes:${req.query.postuuid}:${req.query.commentid}`
+    );
 
-    return res.status(200).json(likesList);
+    if (redisLikes.length > 0) {
+      likeData = JSON.parse(JSON.stringify(redisLikes));
+    } else {
+      /* not needed bc i have my index set up for this case: .orderBy('created_at', 'desc')*/
+      const likes = (
+        await getFirebaseAdmin()
+          .firestore()
+          .collection("blogs")
+          .doc(req.query.postuuid)
+          .collection("comments")
+          .doc(req.query.commentid)
+          .collection("likes")
+          .get()
+      ).docs;
+
+      const likesList = likes.map((like) => like.id);
+      likeData = likesList;
+
+      likesList.map(async (like) => {
+        await redis.hset(
+          `likes:${req.query.postuuid}:${req.query.commentid}`,
+          like,
+          ""
+        );
+      });
+    }
+
+    return res.status(200).json(likeData);
   }
 
   if (req.method === "PUT") {
@@ -59,9 +79,24 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
       } else {
         nowLiked = !req.body.isLikedByUser;
 
+        /* const redisLikes = await redis.hkeys(
+          `likes:${req.body.bloguuid}:${req.body.commentuuid}`
+        ); */
+
         if (req.body.isLikedByUser) {
+          await redis.hdel(
+            `likes:${req.body.bloguuid}:${req.body.commentuuid}`,
+            likeOwner!
+          );
+
           await docRef.delete();
         } else {
+          await redis.hset(
+            `likes:${req.body.bloguuid}:${req.body.commentuuid}`,
+            likeOwner!,
+            ""
+          );
+
           await docRef.set({});
         }
       }

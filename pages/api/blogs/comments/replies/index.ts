@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import withUserAuth from "../../../../middlewares/withUserAuth";
 import initAuth from "../../../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../../../utils/redis";
 
 interface customrequest extends NextApiRequest {
   getUserJWT: AuthUser;
@@ -17,23 +18,51 @@ initAuth();
 const handler = async (req: customrequest, res: NextApiResponse) => {
   if (req.method === "GET") {
     /* not needed bc i have my index set up for this case: .orderBy('created_at', 'desc')*/
-    const replies = (
-      await getFirebaseAdmin()
-        .firestore()
-        .collection("blogs")
-        .doc(req.query.postuuid)
-        .collection("comments")
-        .doc(req.query.commentid)
-        .collection("replies")
-        .orderBy("created_at", "asc")
-        .get()
-    ).docs;
 
-    const data = replies.map((reply) => {
-      return { _id: reply.id, reply: reply.data(), _date: reply.createTime };
-    });
+    const redisReplies = await redis.hvals(
+      `replies:${req.query.postuuid}:${req.query.commentid}`
+    );
 
-    return res.status(200).json(data);
+    let redisData;
+
+    if (redisReplies.length > 0) {
+      redisData = redisReplies
+        .map((reply) => JSON.parse(reply))
+        .sort((a, b) => {
+          return a.reply.created_at - b.reply.created_at;
+        });
+    } else {
+      const replies = (
+        await getFirebaseAdmin()
+          .firestore()
+          .collection("blogs")
+          .doc(req.query.postuuid)
+          .collection("comments")
+          .doc(req.query.commentid)
+          .collection("replies")
+          .orderBy("created_at", "asc")
+          .get()
+      ).docs;
+
+      const data = replies.map((reply) => {
+        return { _id: reply.id, reply: reply.data(), _date: reply.createTime };
+      });
+
+      data.map(async (reply) => {
+        await redis.hset(
+          `replies:${req.query.postuuid}:${req.query.commentid}`,
+          reply._id,
+          JSON.stringify(reply)
+        );
+      });
+
+      redisData = data;
+    }
+
+    /* console.log(`=== replies:${req.query.postuuid}:${req.query.commentid} ===`);
+    console.log(data); */
+
+    return res.status(200).json(redisData);
   }
 
   if (req.method === "POST") {
@@ -79,6 +108,24 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         reply: { body: req.body.body, created_by: commentOwner },
         _date: createTime,
       };
+
+      /* console.log(
+        await redis.hgetall(
+          `replies:${req.body.postuuid}:${req.body.commentid}`
+        )
+      ); */
+
+      await redis.hset(
+        `replies:${req.body.postuuid}:${req.body.commentid}`,
+        newReply._id,
+        JSON.stringify(newReply)
+      );
+
+      /* console.log(
+        await redis.hgetall(
+          `replies:${req.body.postuuid}:${req.body.commentid}`
+        )
+      ); */
 
       return res.status(200).json(newReply);
     } catch (e) {

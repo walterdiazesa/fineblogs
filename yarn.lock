@@ -610,6 +610,13 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/ioredis@^4.26.4":
+  "integrity" "sha512-QFbjNq7EnOGw6d1gZZt2h26OFXjx7z+eqEnbCHSrDI1OOLEgOHMKdtIajJbuCr9uO+X9kQQRe7Lz6uxqxl5XKg=="
+  "resolved" "https://registry.npmjs.org/@types/ioredis/-/ioredis-4.26.4.tgz"
+  "version" "4.26.4"
+  dependencies:
+    "@types/node" "*"
+
 "@types/json-schema@^7.0.7":
   "integrity" "sha512-cxWFQVseBm6O9Gbw1IWb8r6OS4OhSt3hPZLkFApLjM8TEXROBuQGLAH2i2gZpcXdLBIrpXuTDhH7Vbm1iXmNGA=="
   "resolved" "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.7.tgz"
@@ -1238,6 +1245,11 @@
     "strip-ansi" "^6.0.0"
     "wrap-ansi" "^7.0.0"
 
+"cluster-key-slot@^1.1.0":
+  "integrity" "sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw=="
+  "resolved" "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz"
+  "version" "1.1.0"
+
 "color-convert@^1.9.0":
   "integrity" "sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg=="
   "resolved" "https://registry.npmjs.org/color-convert/-/color-convert-1.9.3.tgz"
@@ -1495,6 +1507,11 @@
   "integrity" "sha1-yY2bzvdWdBiOEQlpFRGZ45sfppM="
   "resolved" "https://registry.npmjs.org/defined/-/defined-1.0.0.tgz"
   "version" "1.0.0"
+
+"denque@^1.1.0":
+  "integrity" "sha512-CYiCSgIF1p6EUByQPlGkKnP1M9g0ZV3qMIrqMqZqdwazygIA/YP2vrbcyl1h/WppKJTdl1F85cXIle+394iDAQ=="
+  "resolved" "https://registry.npmjs.org/denque/-/denque-1.5.0.tgz"
+  "version" "1.5.0"
 
 "depd@~1.1.2":
   "integrity" "sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak="
@@ -2450,6 +2467,22 @@
     "has" "^1.0.3"
     "side-channel" "^1.0.4"
 
+"ioredis@^4.27.6":
+  "integrity" "sha512-6W3ZHMbpCa8ByMyC1LJGOi7P2WiOKP9B3resoZOVLDhi+6dDBOW+KNsRq3yI36Hmnb2sifCxHX+YSarTeXh48A=="
+  "resolved" "https://registry.npmjs.org/ioredis/-/ioredis-4.27.6.tgz"
+  "version" "4.27.6"
+  dependencies:
+    "cluster-key-slot" "^1.1.0"
+    "debug" "^4.3.1"
+    "denque" "^1.1.0"
+    "lodash.defaults" "^4.2.0"
+    "lodash.flatten" "^4.4.0"
+    "p-map" "^2.1.0"
+    "redis-commands" "1.7.0"
+    "redis-errors" "^1.2.0"
+    "redis-parser" "^3.0.0"
+    "standard-as-callback" "^2.1.0"
+
 "is-arguments@^1.0.4":
   "integrity" "sha512-1Ij4lOMPl/xB5kBDn7I+b2ttPMKa8szhEIrXDuXQD/oe3HJLTLhqhgGspwgyGd6MOywBUqVvYicF72lkgDnIHg=="
   "resolved" "https://registry.npmjs.org/is-arguments/-/is-arguments-1.1.0.tgz"
@@ -2802,6 +2835,16 @@
   "integrity" "sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8="
   "resolved" "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
   "version" "4.5.0"
+
+"lodash.defaults@^4.2.0":
+  "integrity" "sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw="
+  "resolved" "https://registry.npmjs.org/lodash.defaults/-/lodash.defaults-4.2.0.tgz"
+  "version" "4.2.0"
+
+"lodash.flatten@^4.4.0":
+  "integrity" "sha1-8xwiIlqWMtK7+OSt2+8kCqdlph8="
+  "resolved" "https://registry.npmjs.org/lodash.flatten/-/lodash.flatten-4.4.0.tgz"
+  "version" "4.4.0"
 
 "lodash.includes@^4.3.0":
   "integrity" "sha1-YLuYqHy5I8aMoeUTJUgzFISfVT8="
@@ -3280,6 +3323,11 @@
   dependencies:
     "p-limit" "^2.2.0"
 
+"p-map@^2.1.0":
+  "integrity" "sha512-y3b8Kpd8OAN444hxfBbFfj1FY/RjtTd8tzYwhUqNYXx0fXx2iX4maP4Qr6qhIKbQXI02wTLAda4fYUbDagTUFw=="
+  "resolved" "https://registry.npmjs.org/p-map/-/p-map-2.1.0.tgz"
+  "version" "2.1.0"
+
 "p-try@^2.0.0":
   "integrity" "sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ=="
   "resolved" "https://registry.npmjs.org/p-try/-/p-try-2.2.0.tgz"
@@ -3693,6 +3741,23 @@
   dependencies:
     "picomatch" "^2.2.1"
 
+"redis-commands@1.7.0":
+  "integrity" "sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ=="
+  "resolved" "https://registry.npmjs.org/redis-commands/-/redis-commands-1.7.0.tgz"
+  "version" "1.7.0"
+
+"redis-errors@^1.0.0", "redis-errors@^1.2.0":
+  "integrity" "sha1-62LSrbFeTq9GEMBK/hUpOEJQq60="
+  "resolved" "https://registry.npmjs.org/redis-errors/-/redis-errors-1.2.0.tgz"
+  "version" "1.2.0"
+
+"redis-parser@^3.0.0":
+  "integrity" "sha1-tm2CjNyv5rS4pCin3vTGvKwxyLQ="
+  "resolved" "https://registry.npmjs.org/redis-parser/-/redis-parser-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "redis-errors" "^1.0.0"
+
 "reduce-css-calc@^2.1.8":
   "integrity" "sha512-8liAVezDmUcH+tdzoEGrhfbGcP7nOV4NkGE3a74+qqvE7nt9i4sKLGBuZNOnpI4WiGksiNPklZxva80061QiPg=="
   "resolved" "https://registry.npmjs.org/reduce-css-calc/-/reduce-css-calc-2.1.8.tgz"
@@ -3944,6 +4009,11 @@
   "version" "0.1.10"
   dependencies:
     "type-fest" "^0.7.1"
+
+"standard-as-callback@^2.1.0":
+  "integrity" "sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A=="
+  "resolved" "https://registry.npmjs.org/standard-as-callback/-/standard-as-callback-2.1.0.tgz"
+  "version" "2.1.0"
 
 "statuses@>= 1.5.0 < 2":
   "integrity" "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow="

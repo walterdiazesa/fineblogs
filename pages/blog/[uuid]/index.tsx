@@ -14,6 +14,7 @@ import storage from "../../../utils/storage";
 import { Blog } from "../../../types/blog";
 import { Comment } from "../../../types/interactions";
 import Swal from "sweetalert2";
+import redis from "../../../utils/redis";
 
 interface BlogInteraction extends Blog {
   comments?: Comment[];
@@ -846,61 +847,147 @@ const index = ({
 export const getStaticProps = async (context: { params: { uuid: any } }) => {
   const uuid = context.params.uuid;
 
-  try {
-    // const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs/${uuid}`, { params : { getlikes : true, getcomments: true } })
+  let dataBlog;
 
-    /* ==================================================*/
-    /* ================ INSTEAD OF AXIOS ================*/
-    /* ==================================================*/
+  try {
+    const redisBlog = await redis.get(`blogs:${uuid}`);
 
     const blogRef = getFirebaseAdmin()
       .firestore()
       .collection("blogs")
       .doc(uuid);
-    const blog = await blogRef.get();
 
-    let likes: string[] = [];
-    let comments: Comment[] = [];
+    const redisLikes = await redis.get(`blogs:${uuid}:likes`);
+    const redisComments = await redis.get(`blogs:${uuid}:comments`);
 
-    const likesDocs = (await blogRef.collection("likes").get()).docs;
+    if (redisBlog) {
+      dataBlog = {
+        ...JSON.parse(redisBlog),
+        likes: JSON.parse(redisLikes!),
+        comments: JSON.parse(redisComments!),
+      };
+    } else {
+      // const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/blogs/${uuid}`, { params : { getlikes : true, getcomments: true } })
 
-    if (likesDocs) {
-      likes = likesDocs.map((like) => {
-        return like.id;
-      });
+      /* ==================================================*/
+      /* ================ INSTEAD OF AXIOS ================*/
+      /* ==================================================*/
+
+      const blog = await blogRef.get();
+
+      let likes: string[] = [];
+      let comments: Comment[] = [];
+
+      if (redisLikes) {
+        likes = JSON.parse(redisLikes);
+        /*  console.log("=== Redis Likes ===");
+        console.log(likes); */
+      } else {
+        const likesDocs = (await blogRef.collection("likes").get()).docs;
+
+        if (likesDocs) {
+          likes = likesDocs.map((like) => {
+            return like.id;
+          });
+        }
+
+        await redis.set(`blogs:${uuid}:likes`, JSON.stringify(likes));
+        /* console.log("=== noRedis Likes ===");
+        console.log(likes); */
+      }
+
+      if (redisComments) {
+        comments = JSON.parse(redisComments);
+      } else {
+        const commentsDocs = (
+          await blogRef
+            .collection("comments")
+            .orderBy("created_at", "desc")
+            .get()
+        ).docs;
+
+        if (commentsDocs) {
+          comments = commentsDocs.map((comment) => {
+            return {
+              _id: comment.id,
+              comment: comment.data(),
+              _date: comment.createTime,
+            };
+          });
+        }
+
+        await redis.set(`blogs:${uuid}:comments`, JSON.stringify(comments));
+      }
+
+      const data = JSON.parse(
+        JSON.stringify({
+          _id: blog.id,
+          blog: blog.data(),
+          _date: blog.createTime,
+          likes,
+          comments,
+        })
+      );
+
+      await redis.set(
+        `blogs:${uuid}`,
+        JSON.stringify({
+          _id: blog.id,
+          blog: blog.data(),
+          _date: blog.createTime,
+        })
+      );
+
+      dataBlog = data;
     }
-
-    const commentsDocs = (
-      await blogRef.collection("comments").orderBy("created_at", "desc").get()
-    ).docs;
-
-    if (commentsDocs) {
-      comments = commentsDocs.map((comment) => {
-        return {
-          _id: comment.id,
-          comment: comment.data(),
-          _date: comment.createTime,
-        };
-      });
-    }
-
-    const data = JSON.parse(
-      JSON.stringify({
-        _id: blog.id,
-        blog: blog.data(),
-        _date: blog.createTime,
-        likes,
-        comments,
-      })
-    );
 
     /* ==================================================*/
     /* ================ INSTEAD OF AXIOS ================*/
     /* ==================================================*/
 
+    if (!dataBlog.comments) {
+      const commentsDocs = (
+        await blogRef.collection("comments").orderBy("created_at", "desc").get()
+      ).docs;
+
+      if (commentsDocs) {
+        dataBlog.comments = JSON.parse(
+          JSON.stringify(
+            commentsDocs.map((comment) => {
+              return {
+                _id: comment.id,
+                comment: comment.data(),
+                _date: comment.createTime,
+              };
+            })
+          )
+        );
+      } else {
+        dataBlog.comments = [];
+      }
+
+      await redis.set(
+        `blogs:${uuid}:comments`,
+        JSON.stringify(dataBlog.comments)
+      );
+    }
+    if (!dataBlog.likes) {
+      const likesDocs = (await blogRef.collection("likes").get()).docs;
+
+      if (likesDocs) {
+        dataBlog.likes = likesDocs.map((like) => {
+          return like.id;
+        });
+      } else {
+        dataBlog.likes = [];
+      }
+
+      await redis.set(`blogs:${uuid}:likes`, JSON.stringify(dataBlog.likes));
+    }
+
     return {
       props: {
-        data,
+        data: dataBlog,
         uuid,
       },
       revalidate: parseInt(process.env.NEXT_PUBLIC_REVALIDATE_ON_SECONDS!),
@@ -917,24 +1004,36 @@ export const getStaticProps = async (context: { params: { uuid: any } }) => {
 };
 
 export const getStaticPaths = async () => {
-  const blogs = (
-    await getFirebaseAdmin()
-      .firestore()
-      .collection("blogs")
-      .orderBy("created_at", "desc")
-      .get()
-  ).docs;
-  const data = blogs.map((blog) => {
-    return {
-      _id: blog.id,
-      blog: { ...blog.data(), body: bodyParser(blog.data().body) },
-      _date: blog.createTime,
-    };
-  });
+  const redisBlogs = await redis.get("blogs");
 
-  const ids = data.map((blog) => blog._id);
+  let dataBlogs;
 
-  const paths = ids.map((id) => ({ params: { uuid: id.toString() } }));
+  if (redisBlogs) {
+    dataBlogs = JSON.parse(redisBlogs);
+  } else {
+    const blogs = (
+      await getFirebaseAdmin()
+        .firestore()
+        .collection("blogs")
+        .orderBy("created_at", "desc")
+        .get()
+    ).docs;
+    const data = blogs.map((blog) => {
+      return {
+        _id: blog.id,
+        blog: { ...blog.data(), body: bodyParser(blog.data().body) },
+        _date: blog.createTime,
+      };
+    });
+
+    await redis.set("blogs", JSON.stringify(data));
+
+    dataBlogs = JSON.parse(JSON.stringify(data));
+  }
+
+  const ids = dataBlogs.map((blog: Blog) => blog._id);
+
+  const paths = ids.map((id: string) => ({ params: { uuid: id } }));
 
   return {
     paths,

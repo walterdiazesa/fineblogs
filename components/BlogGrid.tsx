@@ -21,6 +21,7 @@ const BlogGrid = ({
   const [commentsCount, setCommentsCount] = useState(0);
 
   useEffect(() => {
+    // if (uuid !== "01a8dc76-3620-42fd-b0b8-c635cf089e9b") return;
     axios.get(`/api/blogs/likes/${uuid}/count`).then(({ data }) => {
       setLikesCount(data.likesCount);
     });

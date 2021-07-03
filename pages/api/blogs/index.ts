@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import bodyParser from "../../../utils/bodyParser";
 import initAuth from "../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../utils/redis";
 
 initAuth();
 
@@ -65,6 +66,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
         _date: createTime,
       };
+
+      const redisBlogs = await redis.get(`blogs`);
+
+      if (redisBlogs) {
+        await redis.set(
+          `blogs`,
+          JSON.stringify([newBlog, ...JSON.parse(redisBlogs)])
+        );
+      } else {
+        await redis.set(`blogs`, JSON.stringify(newBlog));
+      }
 
       return res.status(200).json(newBlog);
     } catch (e) {

@@ -2,6 +2,8 @@ import { AuthUser, getFirebaseAdmin } from "next-firebase-auth";
 import withUserAuth from "../../../middlewares/withUserAuth";
 import initAuth from "../../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../../utils/redis";
+import { Comment } from "../../../../types/interactions";
 
 interface customrequest extends NextApiRequest {
   getUserJWT: AuthUser;
@@ -37,6 +39,21 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
           error:
             "You're not the comment owner, you have no permissions to do this action",
         });
+      }
+
+      const redisComments = await redis.get(
+        `blogs:${req.query.postuuid}:comments`
+      );
+
+      if (redisComments) {
+        const updatedComments = (JSON.parse(redisComments) as Comment[]).filter(
+          (comment) => comment._id !== req.query.commentid
+        );
+
+        await redis.set(
+          `blogs:${req.query.postuuid}:comments`,
+          JSON.stringify(updatedComments)
+        );
       }
 
       await commentRef.delete();

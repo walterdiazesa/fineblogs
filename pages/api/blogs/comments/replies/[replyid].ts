@@ -2,6 +2,7 @@ import { AuthUser, getFirebaseAdmin } from "next-firebase-auth";
 import withUserAuth from "../../../../middlewares/withUserAuth";
 import initAuth from "../../../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../../../utils/redis";
 
 interface customrequest extends NextApiRequest {
   getUserJWT: AuthUser;
@@ -42,6 +43,10 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         });
       }
 
+      await redis.hdel(
+        `replies:${req.query.bloguuid}:${req.query.commentuuid}`,
+        req.query.replyid
+      );
       await replyRef.delete();
       // const commentExist = (await commentRef.get()).exists
 

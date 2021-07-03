@@ -3,6 +3,7 @@ import withUserAuth from "../../../middlewares/withUserAuth";
 import { AuthUser, getFirebaseAdmin } from "next-firebase-auth";
 import initAuth from "../../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../../../utils/redis";
 
 interface customrequest extends NextApiRequest {
   getUserJWT: AuthUser;
@@ -52,6 +53,20 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         comment: { body: req.body.body, created_by: commentOwner },
         _date: createTime,
       };
+
+      const redisComments = await redis.get(`blogs:${req.body.uuid}:comments`);
+
+      if (redisComments) {
+        await redis.set(
+          `blogs:${req.body.uuid}:comments`,
+          JSON.stringify([newComment, ...JSON.parse(redisComments)])
+        );
+      } else {
+        await redis.set(
+          `blogs:${req.body.uuid}:comments`,
+          JSON.stringify(newComment)
+        );
+      }
 
       return res.status(200).json(newComment);
     } catch (e) {

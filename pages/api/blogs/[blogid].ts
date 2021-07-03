@@ -3,6 +3,8 @@ import withAdminAuth from "../../middlewares/withAdminAuth";
 import initAuth from "../../../utils/initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Comment } from "../../../types/interactions";
+import redis from "../../../utils/redis";
+import { Blog } from "../../../types/blog";
 
 interface customrequest extends NextApiRequest {
   query: {
@@ -115,6 +117,34 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         .doc(req.query.blogid)
         .update(blogInputs); // get
 
+      const redisBlogs = await redis.get(`blogs`);
+
+      if (redisBlogs) {
+        let newThisCachedBlog;
+        const updatedBlogs = (JSON.parse(redisBlogs) as Blog[]).map((blog) => {
+          if (blog._id === req.query.blogid) {
+            newThisCachedBlog = {
+              ...blog,
+              blog: { ...blog.blog, ...blogInputs },
+            };
+            console.log("=== newThisCachedBlog ===");
+            console.log(newThisCachedBlog);
+            return { ...blog, blog: { ...blog.blog, ...blogInputs } };
+          } else {
+            return blog;
+          }
+        });
+
+        console.log("=== updatedBlogs ===");
+        console.log(updatedBlogs);
+
+        await redis.set(`blogs`, JSON.stringify(updatedBlogs));
+        await redis.set(
+          `blogs:${req.query.blogid}`,
+          JSON.stringify(newThisCachedBlog)
+        );
+      }
+
       return res.status(200).json({ blogUp: req.body.formValues });
 
       /* const blogRef = getFirebaseAdmin().firestore().collection('blogs').doc(req.query.blogid)
@@ -148,6 +178,19 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         .collection("blogs")
         .doc(req.query.blogid)
         .delete(); // get
+
+      const redisBlogs = await redis.get(`blogs`);
+      if (redisBlogs) {
+        const updatedBlogs = (JSON.parse(redisBlogs) as Blog[]).filter(
+          (blog) => blog._id !== req.query.blogid
+        );
+
+        await redis.set(`blogs`, JSON.stringify(updatedBlogs));
+
+        redis.del(`blogs:${req.query.blogid}`);
+        redis.del(`blogs:${req.query.blogid}:likes`);
+        redis.del(`blogs:${req.query.blogid}:comments`);
+      }
 
       return res.status(200).json({ blogDeleted: true });
 

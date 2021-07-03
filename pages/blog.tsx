@@ -4,6 +4,7 @@ import Nav from "../components/Nav";
 import BlogGrid from "../components/BlogGrid";
 import bodyParser from "../utils/bodyParser";
 import { Blog as BlogType } from "../types/blog";
+import redis from "../utils/redis";
 
 const Demo = ({ data }: { data: BlogType[] }) => {
   const [blogs, setBlogs] = useState(data);
@@ -36,22 +37,33 @@ const Demo = ({ data }: { data: BlogType[] }) => {
 };
 
 export const getServerSideProps = async () => {
-  const blogs = (
-    await getFirebaseAdmin()
-      .firestore()
-      .collection("blogs")
-      .orderBy("created_at", "desc")
-      .get()
-  ).docs;
-  const data = blogs.map((blog) => {
-    return JSON.parse(
-      JSON.stringify({
+  const redisBlogs = await redis.get("blogs");
+
+  let dataBlogs;
+
+  if (redisBlogs) {
+    dataBlogs = JSON.parse(redisBlogs);
+  } else {
+    const blogs = (
+      await getFirebaseAdmin()
+        .firestore()
+        .collection("blogs")
+        .orderBy("created_at", "desc")
+        .get()
+    ).docs;
+
+    const data = blogs.map((blog) => {
+      return {
         _id: blog.id,
         blog: { ...blog.data(), body: bodyParser(blog.data().body) },
         _date: blog.createTime,
-      })
-    );
-  });
+      };
+    });
+
+    await redis.set("blogs", JSON.stringify(data));
+
+    dataBlogs = JSON.parse(JSON.stringify(data));
+  }
 
   /* const likes = data.map(async (blog) => {
     const likes  = (await getFirebaseAdmin().firestore().collection('blogs').doc(blog._id).collection('likes').get()).docs.length
@@ -65,7 +77,7 @@ export const getServerSideProps = async () => {
 
   return {
     props: {
-      data,
+      data: dataBlogs,
     },
   };
 };
