@@ -408,18 +408,22 @@ export default function Nav({
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center">
-                  <img
-                    className="block lg:hidden h-8 w-auto"
-                    src={blogHookGet ? "logo.svg" : "../logo.svg"}
-                    alt="Workflow"
-                    style={{ padding: "3px 3px" }}
-                  />
-                  <img
-                    className="hidden lg:block h-8 w-auto"
-                    src={blogHookGet ? "logo.svg" : "../logo.svg"}
-                    alt="Workflow"
-                    style={{ padding: "5px 5px" }}
-                  />
+                  <Link href="/">
+                    <img
+                      className="block lg:hidden h-8 w-auto"
+                      src={blogHookGet ? "logo.svg" : "../logo.svg"}
+                      alt="Workflow"
+                      style={{ padding: "3px 3px" }}
+                    />
+                  </Link>
+                  <Link href="/">
+                    <img
+                      className="hidden lg:block h-8 w-auto"
+                      src={blogHookGet ? "logo.svg" : "../logo.svg"}
+                      alt="Workflow"
+                      style={{ padding: "5px 5px" }}
+                    />
+                  </Link>
                 </div>
                 <div className="hidden sm:block sm:ml-6">
                   <div className="flex space-x-4">

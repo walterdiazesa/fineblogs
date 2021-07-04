@@ -127,16 +127,16 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
               ...blog,
               blog: { ...blog.blog, ...blogInputs },
             };
-            console.log("=== newThisCachedBlog ===");
-            console.log(newThisCachedBlog);
+            /* console.log("=== newThisCachedBlog ===");
+            console.log(newThisCachedBlog); */
             return { ...blog, blog: { ...blog.blog, ...blogInputs } };
           } else {
             return blog;
           }
         });
 
-        console.log("=== updatedBlogs ===");
-        console.log(updatedBlogs);
+        /* console.log("=== updatedBlogs ===");
+        console.log(updatedBlogs); */
 
         await redis.set(`blogs`, JSON.stringify(updatedBlogs));
         await redis.set(

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Tammudu+2:wght@400;700&display=swap" rel="stylesheet">
+    <script async src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="static/js/anime.min.js"></script>
+    <link rel="shortcut icon" href="static/favicon.ico">
+    <title>walterdiazesa</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Im Walter, who am I?</h1>
+        <button class="pure-material-button-contained" onclick="window.location = '/blog'">Go to blog</button>
+        <h2><span>> </span>Catch me in the front</h2>
+        <div class="cardend first">
+            <div class="img">
+                <img alt="frontend" src="static/imgs/front.png" class="front">
+            </div>
+            <div class="body">
+                <h3>Front-End</h3>
+                <p>The cute face for your project, <span>SSG, SSR, ISR, SEO</span>, these weird names and much more</p>
+                <ul>
+                    <li>React with NextJs</li>
+                    <li>Blazor</li>
+                    <li>Websockets</li>
+                    <li>Scss, bootstrap, semantic, foundation, materialize</li>
+                    <li>Tailwind css, styled components, chakraui</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><span>> </span>Also, try to find me in the back</h2>
+        <div class="cardend second">
+            <div class="img">
+                <img alt="backend" src="static/imgs/back.png" class="back">
+            </div>
+            <div class="body">
+                <h3>Back-End</h3>
+                <p>Backend, server, <span>database, API</span>, you name it!</p>
+                <ul>
+                    <li>MySQL, MariaDB, SQL Server, Postgre</li>
+                    <li>Firebase, Mongo, Redis</li>
+                    <li>Express, Django, .NET Core</li>
+                    <li>API's REST and GraphQL</li>
+                    <li>Authentication and Authorization from scratch or as a Service with JWT and cached sessions</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><span>> </span>And, let's rest on the cloud</h2>
+        <div class="cardend third">
+            <div class="img">
+                <img alt="backend" src="static/imgs/cloud.png" class="cloud">
+            </div>
+            <div class="body">
+                <h3>Deploy</h3>
+                <p>I'll show your project to the entire world, <span>traffic bandwidth? SaaS? IaaS? DBaaS? AaaS? Serverless?</span> let me handle the boring stuff for you</p>
+                <ul>
+                    <li>Containerized instances</li>
+                    <li>Azure, Firebase, DigitalOcean</li>
+                    <li>Vercel, Netlify, Heroku</li>
+                    <li>Horizontal and vertical scalability, high availability and fully customizable based and measured right for your workload and requirements</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><span>> </span>So, tf am I?</h2>
+        <div class="cardend fullstack">
+            <div class="img">
+                <img alt="backend" src="static/imgs/fullstack.png" class="fullstack">
+            </div>
+            <div class="body">
+                <h3>Full Stack Developer</h3>
+                <p>I am the person to go with when you want to carry out a project from either the design process stage or when you are about to take it to production, it is not a problem for a full stack developer</p>
+                <p><span>Common and well known used languages: </span>TypeScript, Javascript, C#, SQL, Java, Python, C++</p>
+                <p><span>Main stacks: </span>MERN, FERN, .NET, JAM, Microservices</p>
+            </div>
+        </div>
+
+        <h2 class="projectsh2"><span>> </span>Projets and experience</h2>
+        <div class="cardend fullstack">
+            <div class="projectsbody">
+                <ul>
+                    <li>ProtokolDB - <a href="https://protokoldatabase.000webhostapp.com/graph.php" target="_blank">Demo</a></li>
+                    <li>DripRP - <a href="https://github.com/walterdiazesa/driprp" target="_blank">Documentación</a> / <a href="https://driprpdb.web.app/" target="_blank">Demo</a></li>
+                    <li>NextBlogs - <a href="https://github.com/walterdiazesa/nextblogs" target="_blank">Documentación</a> / <a href="https://nextblogs-topaz.vercel.app/" target="_blank">Demo</a></li>
+                    <li>PokeGraphQL - <a href="https://github.com/walterdiazesa/pokegraphql" target="_blank">Documentación</a> / <a href="https://pokegraphql.vercel.app/" target="_blank">Demo</a></li>
+                    <li>Sykes (actual)</li>
+                </ul>
+                <p><a href="static/docs/curriculum_pliret.pdf" target="_blank">Curriculum Vitae.pdf</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <h1>Im Walter, who are you?</h1>
+        <form onsubmit="return false">
+            <label class="field field_v3">
+                <input class="field__input" placeholder="Enter your email" id="email">
+                <span class="field__label-wrap">
+                    <span class="field__label">E-mail</span>
+                </span>
+            </label>
+            <button class="pure-material-button-contained" onclick="sendEmail()">Send</button>
+        </form>
+    </div>
+
+    <script>
+        
+        function sendEmail() {
+            const emailSent = document.getElementById("email").value.trim().length !== 0
+
+            let modalTitle = ""
+            let modalText = ""
+            let modalIcon = ""
+            let modalBtnTxt = ""
+
+            if (emailSent) {
+                modalTitle = "Success"
+                modalText = "The mail has been sent successfully"
+                modalIcon = "success"
+                modalBtnTxt = "Thanks"
+
+                document.getElementById("email").value = ""
+            } else {
+                modalTitle = "Error"
+                modalText = "The mail could not be sent"
+                modalIcon = "error"
+                modalBtnTxt = "Understood"
+            }
+
+            Swal.fire({
+                text: modalText,
+                icon: modalIcon,
+                title: emailSent ? undefined : modalTitle,
+                showConfirmButton: !emailSent,
+                confirmButtonText: modalBtnTxt,
+                timer: emailSent ? 1000 : undefined
+            })
+        }
+
+        /* document READY */
+        document.querySelector(".container").style.opacity = 0
+        document.querySelector(".footer").style.opacity = 0
+        document.querySelectorAll(".body").forEach((Element) => {
+            Element.style.opacity = 0
+        })
+        document.querySelector(".projectsbody").style.opacity = 0
+        document.querySelectorAll("h2").forEach((Element) => {
+            Element.style.opacity = 0
+        })
+        document.querySelector(".footer form").style.opacity = 0
+
+        let isMobile = window.innerWidth < 756
+        window.addEventListener('resize', function(event) {
+            isMobile = window.innerWidth < 756
+        }, false)
+
+        const Y_AXIS_ANIMATE = 25
+
+        firstAnimate(".cardend.first .front")
+        firstAnimate(".cardend.second .back")
+        firstAnimate(".cardend.third .cloud")
+        firstAnimate(".cardend.fullstack .fullstack")
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            opaceElements('.container,.footer', 650)
+            opaceElements('.body,.projectsbody', 1000)
+            opaceElements('h2', 850)
+            opaceElements(".footer form", 1250)
+        
+            startAnimate('.cardend.first .front')
+            startAnimate(".cardend.second .back")
+            startAnimate(".cardend.third .cloud")
+            startAnimate(".cardend.fullstack .fullstack")
+        })
+
+        function opaceElements(_targets, _duration) {
+            anime({
+                targets: _targets,
+                opacity: 1,
+                duration: _duration,
+                easing: 'linear'
+            })
+        }
+
+        function firstAnimate(query) {
+            document.querySelector(query).style.transform = `translateY(${Y_AXIS_ANIMATE}px)`
+        }
+        function startAnimate(query) {
+            anime({
+                targets: query,
+                translateY: 0,
+                delay: 200
+            })
+        }
+
+        setOverOut(".cardend.first .front")
+        setOverOut(".cardend.second .back")
+        setOverOut(".cardend.third .cloud")
+        setOverOut(".cardend.fullstack .fullstack")
+
+        function setOverOut(query) {
+            document.querySelector(query).addEventListener("mouseover", function(event) {
+            //console.log("over")
+                if (!isMobile) {
+                    anime({
+                        targets: query,
+                        translateY: Y_AXIS_ANIMATE
+                    })
+                } else {
+                    
+                }
+            })
+
+            document.querySelector(query).addEventListener("mouseout", function(event) {
+            //console.log("out")
+                if (!isMobile) {
+                    anime({
+                        targets: query,
+                        translateY: 0
+                    })
+                } else {
+
+                }
+            })
+
+            document.querySelector(query).addEventListener("click", function(event) {
+                if (isMobile) {
+                    anime({
+                        targets: query,
+                        translateY: Y_AXIS_ANIMATE
+                    })
+                    setTimeout(() => {
+                        anime({
+                            targets: query,
+                            translateY: 0
+                        })
+                    }, 500)
+                }
+            })
+        }
+        
+    </script>
+</body>
+</html>
