@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Comment } from "../../../types/interactions";
 import redis from "../../../utils/redis";
 import { Blog } from "../../../types/blog";
+import bodyParser from "../../../utils/bodyParser";
 
 interface customrequest extends NextApiRequest {
   query: {
@@ -118,18 +119,31 @@ const handler = async (req: customrequest, res: NextApiResponse) => {
         .update(blogInputs); // get
 
       const redisBlogs = await redis.get(`blogs`);
+      const redisBlog = await redis.get(`blogs:${req.query.blogid}`);
 
       if (redisBlogs) {
         let newThisCachedBlog;
         const updatedBlogs = (JSON.parse(redisBlogs) as Blog[]).map((blog) => {
           if (blog._id === req.query.blogid) {
             newThisCachedBlog = {
-              ...blog,
-              blog: { ...blog.blog, ...blogInputs },
+              ...JSON.parse(redisBlog!),
+              blog: { ...(JSON.parse(redisBlog!) as Blog).blog, ...blogInputs },
             };
-            /* console.log("=== newThisCachedBlog ===");
-            console.log(newThisCachedBlog); */
-            return { ...blog, blog: { ...blog.blog, ...blogInputs } };
+
+            if ((blogInputs as any).body) {
+              return {
+                ...newThisCachedBlog,
+                blog: {
+                  ...newThisCachedBlog.blog,
+                  body: bodyParser((blogInputs as any).body),
+                },
+              };
+            } else {
+              return {
+                ...blog,
+                blog: { ...blog.blog, ...blogInputs },
+              };
+            }
           } else {
             return blog;
           }

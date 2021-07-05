@@ -214,14 +214,17 @@ const CommentGrid = ({
     <div className="w-full bg-commentgrid rounded-xl overflow-hidden p-3 my-6">
       <div className="block sm:flex">
         <div className="flex">
-          <Image
-            src={imgUser}
-            alt={displayName}
-            className="h-6 w-6 rounded-full"
-            width={24}
-            height={24}
-            quality={100}
-          />
+          <div className="relative h-6 w-6">
+            <Image
+              src={imgUser}
+              alt={displayName}
+              className="rounded-full"
+              width={24}
+              height={24}
+              quality={100}
+              layout="fixed"
+            />
+          </div>
           <p className="mx-2 textPink text-sm font-medium">
             {displayName}{" "}
             <span className="text-gray-400 text-sm font-light">
