@@ -3,6 +3,10 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      padding: {
+        nvicosm: "3px",
+        nvicomd: "5px",
+      },
       lineHeight: {
         citation: "3.3",
         12: "3rem",

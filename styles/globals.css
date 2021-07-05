@@ -197,126 +197,7 @@ span {
   font-weight: 900;
 }
 
-.cardend {
-  max-width: 100vw;
-  height: auto;
-}
-
-.cardend h3 {
-  color: var(--w);
-  font-family: "Baloo Tammudu 2", cursive;
-  margin: 0 0;
-  padding: 0 0;
-}
-
-.cardend p {
-  color: var(--w);
-  font-family: "Baloo Tammudu 2", cursive;
-  margin: 0 0;
-  padding: 0 4%;
-}
-
-.cardend span {
-  color: var(--c7);
-  font-family: "Baloo Tammudu 2", cursive;
-}
-
-.cardend img.front {
-  width: 60%;
-}
-
-.cardend img.back {
-  width: 40%;
-}
-
-.cardend img.cloud {
-  width: 60%;
-}
-
-.cardend img.fullstack {
-  width: 94%;
-}
-
-.cardend ul {
-  color: var(--w);
-  font-family: "Baloo Tammudu 2", cursive;
-  list-style: none;
-  padding-right: 8%;
-}
-
-.cardend a {
-  color: var(--c7);
-}
-
 @media screen and (min-width: 756px) {
-  .cardend div.body {
-    width: 50%;
-  }
-  .cardend div.img {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .container .cardend.first div.body {
-    order: 1;
-  }
-  .container .cardend.first div.img {
-    order: 2;
-  }
-
-  .container .cardend.third div.body {
-    order: 1;
-  }
-  .container .cardend.third div.img {
-    order: 2;
-  }
-
-  .cardend.fullstack {
-    display: block;
-  }
-
-  .cardend.fullstack div.img,
-  .cardend.fullstack div.body {
-    width: 60%;
-    margin: 0 auto;
-  }
-
-  .cardend.fullstack div.body {
-    padding-top: 3.5%;
-    padding-bottom: 0.5%;
-  }
-
-  .cardend div.body li,
-  .cardend div.body p,
-  .cardend div.body h3 {
-    text-align: justify;
-    padding-left: 20%;
-  }
-
-  .cardend {
-    display: flex;
-    align-items: center;
-  }
-
-  .cardend.cardend.fullstack {
-    text-align: justify;
-  }
-  .cardend.cardend.fullstack ul {
-    text-align: justify;
-    display: inline-block;
-    padding: 0 auto;
-  }
-
-  .cardend.cardend.fullstack div.projectsbody {
-    text-align: center;
-    padding-bottom: 1%;
-  }
-
-  .projectsh2 {
-    margin-bottom: 0;
-  }
-
   h1 {
     font-size: 3.5em;
     margin-bottom: 0;
@@ -328,16 +209,6 @@ span {
   h2 {
     font-size: 1.75em;
   }
-}
-
-li::before {
-  content: "•";
-  color: var(--c4);
-  display: inline-block;
-  width: 1em;
-  margin-left: -1em;
-  font-family: "Baloo Tammudu 2", cursive;
-  font-weight: 900;
 }
 
 .footer {
@@ -359,17 +230,4 @@ form span {
 
 .field__input {
   color: var(--w);
-}
-
-.cardend.fullstack h3 {
-  color: var(--c7);
-  font-family: "Baloo Tammudu 2", cursive;
-  margin: 0 0;
-  padding: 0 0;
-}
-
-.cardend.fullstack span {
-  color: var(--c7);
-  font-family: "Baloo Tammudu 2", cursive;
-  font-weight: 900;
 }

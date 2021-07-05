@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatDate } from "../utils/formatDates";
 import axios from "axios";
 import { HeartIcon, AnnotationIcon } from "@heroicons/react/solid";
+import Image from "next/image";
 
 const BlogGrid = ({
   uuid,
@@ -36,14 +37,19 @@ const BlogGrid = ({
       <div className="2xl:relative max-w-md bgNavItemHover rounded-xl shadow-md overflow-hidden md:max-w-2xl my-3 sm:my-3 2xl:my-6 mx-8 sm:mx-auto 2xl:max-w-sm 2xl:mx-6 2xl:shadow-2xl">
         <div className="md:flex 2xl:block" style={{ cursor: "pointer" }}>
           <div className="hidden md:flex md:flex-shrink-0">
-            <img
-              className="h-48 w-full object-cover md:max-h-56 md:h-full md:w-48 2xl:w-full 2xl:h-48"
-              src={img ? img : "/imgs/dummyimg.png"}
-              alt="dummyimg"
-              onError={(e) =>
-                ((e.target as HTMLImageElement).src = "/imgs/dummyimg.png")
-              }
-            />
+            <div className="md:relative md:h-full md:w-48 2xl:w-full 2xl:h-48">
+              <Image
+                /* className="h-48 w-full object-cover md:max-h-56 md:h-full md:w-48 2xl:w-full 2xl:h-48" */
+                src={img ? img : "/imgs/dummyimg.png"}
+                alt="dummyimg"
+                onError={(e) =>
+                  ((e.target as HTMLImageElement).src = "/imgs/dummyimg.png")
+                }
+                quality={100}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
           </div>
           <div className="p-8">
             <a className="block mt-1 text-lg leading-tight font-bold textYellow hover:underline 2xl:mb-2">

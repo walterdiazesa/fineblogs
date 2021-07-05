@@ -6,7 +6,7 @@ const initAuth = () => {
   init({
     debug: false,
     authPageURL: "/auth",
-    appPageURL: "/",
+    appPageURL: "/blog",
     loginAPIEndpoint: "/api/auth/login",
     logoutAPIEndpoint: "/api/auth/logout",
     firebaseAdminInitConfig: {

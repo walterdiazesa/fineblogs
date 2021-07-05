@@ -10,6 +10,7 @@ import { getPhoneOrProvider, isAuth } from "../utils/isAuth";
 import storage from "../utils/storage";
 import { Blog as BlogType } from "../types/blog";
 import Swal, { SweetAlertIcon } from "sweetalert2";
+import Image from "next/image";
 
 /**
  * Add classes for each case for TailwindCSS.
@@ -410,18 +411,9 @@ export default function Nav({
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/">
                     <img
-                      className="block lg:hidden h-8 w-auto"
+                      className="h-8 w-auto cursor-pointer p-nvicosm lg:p-nvicomd"
                       src={blogHookGet ? "logo.svg" : "../logo.svg"}
-                      alt="Workflow"
-                      style={{ padding: "3px 3px" }}
-                    />
-                  </Link>
-                  <Link href="/">
-                    <img
-                      className="hidden lg:block h-8 w-auto"
-                      src={blogHookGet ? "logo.svg" : "../logo.svg"}
-                      alt="Workflow"
-                      style={{ padding: "5px 5px" }}
+                      alt="logo"
                     />
                   </Link>
                 </div>
@@ -484,11 +476,15 @@ export default function Nav({
                         <div>
                           <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                             <span className="sr-only">Open user menu</span>
-                            <img
+                            <Image
                               className="h-8 w-8 rounded-full"
-                              /* https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80 */
                               src={getUserImage(AuthUser)}
-                              alt=""
+                              alt="profile"
+                              width={32}
+                              height={32}
+                              layout="fixed"
+                              priority
+                              quality={100}
                             />
                           </Menu.Button>
                         </div>

@@ -13,6 +13,7 @@ import getUserImage from "../utils/getUserImage";
 import { getPhoneOrProvider, isAuth } from "../utils/isAuth";
 import Swal from "sweetalert2";
 import { Reply } from "../types/interactions";
+import Image from "next/image";
 
 const CommentGrid = ({
   uuid,
@@ -39,8 +40,8 @@ const CommentGrid = ({
   /* https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80 */
   const [imgUser, setImgUser] = useState(
     userEmail.includes("@")
-      ? "../imgs/profiles/@.png"
-      : "../imgs/profiles/phone.png"
+      ? "/imgs/profiles/@.png" // ..
+      : "/imgs/profiles/phone.png" // ..
   );
 
   useEffect(() => {
@@ -213,10 +214,13 @@ const CommentGrid = ({
     <div className="w-full bg-commentgrid rounded-xl overflow-hidden p-3 my-6">
       <div className="block sm:flex">
         <div className="flex">
-          <img
+          <Image
             src={imgUser}
             alt={displayName}
             className="h-6 w-6 rounded-full"
+            width={24}
+            height={24}
+            quality={100}
           />
           <p className="mx-2 textPink text-sm font-medium">
             {displayName}{" "}

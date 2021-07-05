@@ -6,6 +6,7 @@ import { formatDate } from "../utils/formatDates";
 import getUserImage from "../utils/getUserImage";
 import { getPhoneOrProvider } from "../utils/isAuth";
 import Swal from "sweetalert2";
+import Image from "next/image";
 
 const ReplyGrid = ({
   bloguuid,
@@ -33,8 +34,8 @@ const ReplyGrid = ({
   );
   const [imgUser, setImgUser] = useState(
     userEmail.includes("@")
-      ? "../imgs/profiles/@.png"
-      : "../imgs/profiles/phone.png"
+      ? "/imgs/profiles/@.png" // ..
+      : "/imgs/profiles/phone.png" // ..
   );
 
   useEffect(() => {
@@ -96,11 +97,17 @@ const ReplyGrid = ({
     <div className="bg-commentgridextradark rounded-md m-2 p-2">
       <div className="block sm:flex">
         <div className="flex">
-          <img
-            src={imgUser}
-            alt={displayName}
-            className="h-6 w-6 rounded-full"
-          />
+          <div className="relative h-6 w-6">
+            <Image
+              src={imgUser}
+              alt={displayName}
+              className="rounded-full"
+              quality={100}
+              width={24}
+              height={24}
+              layout="fixed"
+            />
+          </div>
           <p className="mx-2 textPink text-sm font-medium">
             {displayName}{" "}
             <span className="text-gray-400 text-sm font-light">
