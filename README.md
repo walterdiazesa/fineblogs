@@ -97,7 +97,9 @@ Firebase region setup for my particular case, in which my target audience have b
 
 > **Firestore Organization:**
 
-> ![firestoreorganization1](https://user-images.githubusercontent.com/58494087/124527069-c6e11b00-ddc1-11eb-838a-fe75f6c8404e.jpg) > ![firestoreorganization2](https://user-images.githubusercontent.com/58494087/124527065-c6488480-ddc1-11eb-8c30-8fb8a81974a1.jpg)![firestoreorganization3](https://user-images.githubusercontent.com/58494087/124527068-c6e11b00-ddc1-11eb-999b-e0cde4a88fa1.jpg) > ![firestoreorganization3](https://user-images.githubusercontent.com/58494087/124527076-cd6f9280-ddc1-11eb-8279-e6ce3df3a9f9.jpg)
+> ![firestoreorganization1](https://user-images.githubusercontent.com/58494087/124527069-c6e11b00-ddc1-11eb-838a-fe75f6c8404e.jpg) 
+> ![firestoreorganization2](https://user-images.githubusercontent.com/58494087/124527065-c6488480-ddc1-11eb-8c30-8fb8a81974a1.jpg)
+> ![firestoreorganization3](https://user-images.githubusercontent.com/58494087/124527068-c6e11b00-ddc1-11eb-999b-e0cde4a88fa1.jpg)
 
 > **Storage Rules:**
 
