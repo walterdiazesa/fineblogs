@@ -97,8 +97,9 @@ Firebase region setup for my particular case, in which my target audience have b
 
 > **Firestore Organization:**
 
-> ![firestoreorganization1](https://user-images.githubusercontent.com/58494087/124527069-c6e11b00-ddc1-11eb-838a-fe75f6c8404e.jpg)
-> ![firestoreorganization2](https://user-images.githubusercontent.com/58494087/124527065-c6488480-ddc1-11eb-8c30-8fb8a81974a1.jpg) > ![firestoreorganization3](https://user-images.githubusercontent.com/58494087/124527068-c6e11b00-ddc1-11eb-999b-e0cde4a88fa1.jpg)
+> ![firestoreorganization1](https://user-images.githubusercontent.com/58494087/124527069-c6e11b00-ddc1-11eb-838a-fe75f6c8404e.jpg) 
+> ![firestoreorganization2](https://user-images.githubusercontent.com/58494087/124527065-c6488480-ddc1-11eb-8c30-8fb8a81974a1.jpg)
+> ![firestoreorganization3](https://user-images.githubusercontent.com/58494087/124527068-c6e11b00-ddc1-11eb-999b-e0cde4a88fa1.jpg)
 
 > **Storage Rules:**
 
@@ -117,7 +118,6 @@ Firebase region setup for my particular case, in which my target audience have b
 ![storageorganization](https://user-images.githubusercontent.com/58494087/124526593-8b921c80-ddc0-11eb-8754-ba5e92ce8795.jpg)
 
 ## Points of interest
-
 > JWT Approach
 
 The blog is thinking about the fastest loads possibles, so it used all the NextJs good practices and approaches that I can think of (not so many), using SSR for loading the /blog where is the more "CPU intensive" page in the site, using next/image instead of HTML/img for the quickest loads on all the images and less bandwidth used, caching on Redis for faster loads with all the elements.
