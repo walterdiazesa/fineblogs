@@ -36,3 +36,7 @@ yarn-error.log*
 # yalc
 .yalc
 yalc.lock
+
+# personal
+/public/docs
+/public/index.html
