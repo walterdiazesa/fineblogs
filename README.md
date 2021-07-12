@@ -117,6 +117,31 @@ Firebase region setup for my particular case, in which my target audience have b
 
 ![storageorganization](https://user-images.githubusercontent.com/58494087/124526593-8b921c80-ddc0-11eb-8754-ba5e92ce8795.jpg)
 
+## Points of interest
+> JWT Approach
+
+The blog is thinking about the fastest loads possibles, so it used all the NextJs good practices and approaches that I can think of (not so many), using SSR for loading the /blog where is the more "CPU intensive" page in the site, using next/image instead of HTML/img for the quickest loads on all the images and less bandwidth used, caching on Redis for faster loads with all the elements.
+
+I think JWT is the best approach you can use for login, regardless of the technology you use, but you know what is better than JWT? Signed and secured JWT
+
+![jwtcoded](https://user-images.githubusercontent.com/58494087/125226857-17a7b680-e28f-11eb-8818-f3f10695595e.jpg)
+
+> Roles
+
+Plus, the roles for the app are normal user (default to everyone) and "admin", I choose to manage roles inside the JWT with a Firebase Auth approach: Custom Claims, so only the signed users with the Custom Claim "Admin" can create, update and delete blogs
+
+![adminrole](https://user-images.githubusercontent.com/58494087/125226950-3a39cf80-e28f-11eb-8088-de2b91d9f501.jpg)
+
+> Blog Format
+
+The approach I choose to format the blog is simple, any HTML/React content
+
+![redditpost](https://user-images.githubusercontent.com/58494087/125227004-4c1b7280-e28f-11eb-912b-f24197118803.jpg)
+
+> Extra
+
+The code is set up for auto-follow the Google guidelines for ESLint, using prettier, plus, using Husky as a hook when you do a git commit (thanks to this goat https://www.youtube.com/watch?v=sH93pQb9bWM), fully responsive mobile-first and the whole app is secured in the client + server + using Firebase Rules for some sort of firewall/extra security layer
+
 ## How to use the project
 
     1- Clone or download the project
