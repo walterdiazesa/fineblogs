@@ -85,13 +85,9 @@
         <div class="cardend fullstack">
             <div class="projectsbody">
                 <ul>
-                    <li>ProtokolDB - <a href="https://protokoldatabase.000webhostapp.com/graph.php" target="_blank">Demo</a></li>
-                    <li>DripRP - <a href="https://github.com/walterdiazesa/driprp" target="_blank">Documentación</a> / <a href="https://driprpdb.web.app/" target="_blank">Demo</a></li>
-                    <li>NextBlogs - <a href="https://github.com/walterdiazesa/nextblogs" target="_blank">Documentación</a> / <a href="https://nextblogs-topaz.vercel.app/" target="_blank">Demo</a></li>
-                    <li>PokeGraphQL - <a href="https://github.com/walterdiazesa/pokegraphql" target="_blank">Documentación</a> / <a href="https://pokegraphql.vercel.app/" target="_blank">Demo</a></li>
-                    <li>Sykes (actual)</li>
+                    <li>Sorry :(, right now I'm refactoring my repo, so the demos and documentation are hidden, but you can find a few of my projects on my Github</li>
                 </ul>
-                <p><a href="static/docs/curriculum_pliret.pdf" target="_blank">Curriculum Vitae.pdf</a></p>
+                <p><a href="static/docs/CURRICULUM_VITAE.pdf" target="_blank">Curriculum Vitae.pdf</a></p>
             </div>
         </div>
     </div>
@@ -111,6 +107,14 @@
     <script>
         
         function sendEmail() {
+
+            Swal.fire({
+                text: "Sorry, I disabled this option by now, please contact me through my email 'walterwalon@gmail.com'",
+                icon: "info",
+                title: "Send email"
+            })
+            return
+
             const emailSent = document.getElementById("email").value.trim().length !== 0
 
             let modalTitle = ""
