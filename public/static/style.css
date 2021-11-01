@@ -72,6 +72,11 @@ span {
     font-family: 'Baloo Tammudu 2', cursive;
 }
 
+.text-pink {
+  color: var(--c7);
+  font-family: 'Baloo Tammudu 2', cursive;
+}
+
 .cardend img.front {
     /* position: absolute; */
     width: 60%;

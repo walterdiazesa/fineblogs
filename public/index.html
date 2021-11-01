@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <h1>Im Walter, who am I?</h1>
-        <button class="pure-material-button-contained" onclick="window.location = '/blog'">Go to blog</button>
+        <p><a class="text-pink" href="static/docs/walterdiazesaResume.pdf" target="_blank">Curriculum Vitae.pdf</a></p>
         <h2><span>> </span>Catch me in the front</h2>
         <div class="cardend first">
             <div class="img">
@@ -84,7 +84,6 @@
         <h2 class="projectsh2"><span>> </span>Projets and experience</h2>
         <div class="cardend fullstack">
             <div class="projectsbody">
-                <p><a href="static/docs/walterdiazesaResume.pdf" target="_blank">Curriculum Vitae.pdf</a></p>
                 <ul>
                     <li><a href="https://github.com/walterdiazesa" target="_blank">Github</a></li>
                     <li><a href="https://www.linkedin.com/in/walter-diaz-638835214/" target="_blank">LinkedIn</a></li>
@@ -94,6 +93,7 @@
     </div>
     <div class="footer">
         <h1>Im Walter, who are you?</h1>
+        <button class="pure-material-button-contained" onclick="window.location = '/blog'">Go to blog</button>
         <!-- <form onsubmit="return false">
             <label class="field field_v3">
                 <input class="field__input" placeholder="Enter your email" id="email">
@@ -157,7 +157,7 @@
         document.querySelectorAll("h2").forEach((Element) => {
             Element.style.opacity = 0
         })
-        document.querySelector(".footer form").style.opacity = 0
+        //document.querySelector(".footer form").style.opacity = 0
 
         let isMobile = window.innerWidth < 756
         window.addEventListener('resize', function(event) {
@@ -175,7 +175,7 @@
             opaceElements('.container,.footer', 650)
             opaceElements('.body,.projectsbody', 1000)
             opaceElements('h2', 850)
-            opaceElements(".footer form", 1250)
+            //opaceElements(".footer form", 1250)
         
             startAnimate('.cardend.first .front')
             startAnimate(".cardend.second .back")
