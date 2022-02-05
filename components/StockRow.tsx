@@ -69,19 +69,23 @@ const StockRow = ({
             api
           ) : (
             <>
-              ${api.price}
-              <span
-                className={`text-xs ${
-                  api.day_change === 0
-                    ? ""
-                    : api.day_change > 0
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
+              <a
+                href={`https://www.google.com/finance/quote/${api.ticker}:NASDAQ?window=1M`}
               >
-                {" "}
-                ({(api.day_change < 0 ? "" : "+") + api.day_change}%)
-              </span>
+                ${api.price}
+                <span
+                  className={`text-xs ${
+                    api.day_change === 0
+                      ? ""
+                      : api.day_change > 0
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {" "}
+                  ({(api.day_change < 0 ? "" : "+") + api.day_change}%)
+                </span>
+              </a>
             </>
           )}
         </p>

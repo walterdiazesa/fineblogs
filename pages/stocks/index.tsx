@@ -109,7 +109,7 @@ const index = ({
         image="/imgs/stocks/jpmorganlogo.png"
       />
 
-      <div className="mx-3 md:mt-12">
+      <div className="mx-3 mb-4 md:my-12">
         <img
           src="/imgs/stocks/stockportfoliojustification.jpg"
           alt="stockportfoliojustification"
@@ -117,6 +117,44 @@ const index = ({
           height="auto"
           className="mx-auto rounded-md"
         />
+      </div>
+
+      <div className="mx-3 md:mx-20 mb-3">
+        <p className="text-white my-3">
+          - <span className="text-xl font-bold text-green-600">•</span>: The
+          asset is outstandingly stable in the long run, hardly suffers falls,
+          and those he suffers do not represent a significant risk
+        </p>
+        <p className="text-white my-3">
+          - <span className="text-xl font-bold text-yellow-300">•</span>: The
+          asset hardly generates a risk for the investment, but the risk/return
+          on the investment is more than worth it; in any case, it still means a
+          small but considerable risk by any measure
+        </p>
+        <p className="text-white my-3">
+          - <span className="text-xl font-bold text-yellow-500">•</span>: We
+          enter dangerous territory, these assets have a tiny volatility factor,
+          but quite possibly, they tend to rise, and the value of the possible
+          return makes the risk worthwhile
+        </p>
+        <p className="text-white my-3">
+          - <span className="text-xl font-bold text-red-500">•</span>: Extremely
+          volatile, under any concept of considerable or long-term investment,
+          avoid them, but the return in case of winning is absurdly huge, which
+          makes it an asset to consider in certain situations
+        </p>
+        <p className="text-white my-3">
+          - <span className="text-xl font-bold text-gray-500">•</span>: In most
+          cases bank-safe, and in many literally a bank, the risk is so little
+          that it is not even worth considering, the disadvantage is that thanks
+          to the security of the asset, the return is usually lower
+        </p>
+
+        <p className="text-white my-3 font-bold">
+          The Today value percentage represents the loss or win against
+          yesterday. To know more info about the graphics or revenue over time,
+          click the Today value of the asset
+        </p>
       </div>
     </>
   );
