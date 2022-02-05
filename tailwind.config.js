@@ -19,6 +19,7 @@ module.exports = {
         commentgridextradark: "hsl(248, 80%, 58%)" /* hsl(248, 53%, 52%) */,
         slatepurple: "#371BB1",
         darkslatepurple: "#362486",
+        textPink: "#E5BACE",
       },
       zIndex: {
         "-1": "-1",
