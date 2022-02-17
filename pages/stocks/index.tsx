@@ -93,7 +93,7 @@ const index = ({
       <StockRow
         safe="critical"
         name="Bitcoin"
-        percent="$50"
+        percent="-"
         image="/imgs/stocks/bitcoinlogo.png"
       />
       <StockRow
@@ -162,50 +162,47 @@ const index = ({
 
 export const getStaticProps = async () => {
   try {
-    const redisStocks = await redis.get(`stocks`);
-
     const stockData: {
       [key: string]: StockData;
-    } = redisStocks ? JSON.parse(redisStocks) : {};
+    } = {};
 
-    if (!redisStocks) {
-      const {
-        data: data1,
-      }: {
-        data: StockRequest;
-      } = await axios.get(
-        `https://api.stockdata.org/v1/data/quote?symbols=AAPL,TSLA,MSFT&api_token=${process.env.STOCKDATA_KEY}`
-      );
-      const {
-        data: data2,
-      }: {
-        data: StockRequest;
-      } = await axios.get(
-        `https://api.stockdata.org/v1/data/quote?symbols=AMZN,GOOGL,NVDA&api_token=${process.env.STOCKDATA_KEY}`
-      );
+    const {
+      data: data1,
+    }: {
+      data: StockRequest;
+    } = await axios.get(
+      `https://api.stockdata.org/v1/data/quote?symbols=AAPL,TSLA,MSFT&api_token=${process.env.STOCKDATA_KEY}`
+    );
+    const {
+      data: data2,
+    }: {
+      data: StockRequest;
+    } = await axios.get(
+      `https://api.stockdata.org/v1/data/quote?symbols=AMZN,GOOGL,NVDA&api_token=${process.env.STOCKDATA_KEY}`
+    );
 
-      if (
-        data1.meta.requested === data1.meta.returned &&
-        data2.meta.requested === data2.meta.returned
-      ) {
-        data1.data.map((item) => {
-          stockData[item.ticker] = item;
-        });
-        data2.data.map((item) => {
-          stockData[item.ticker] = item;
-        });
-        await redis.set("stocks", JSON.stringify(stockData), "ex", 86400);
-      }
+    if (
+      data1.meta.requested === data1.meta.returned &&
+      data2.meta.requested === data2.meta.returned
+    ) {
+      data1.data.map((item) => {
+        stockData[item.ticker] = item;
+      });
+      data2.data.map((item) => {
+        stockData[item.ticker] = item;
+      });
     }
 
     return {
       props: {
         stockData,
+        revalidate: 86400,
       },
     };
   } catch (e) {
     return {
       props: {},
+      revalidate: 86400,
     };
   }
 };
