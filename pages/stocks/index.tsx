@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import Nav from "../../components/Nav";
 import StockRow from "../../components/StockRow";
 import { StockData, StockRequest } from "../../types/stocks";
-import redis from "../../utils/redis";
 
 const index = ({
   stockData,
